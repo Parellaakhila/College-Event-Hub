@@ -1,0 +1,149 @@
+/* ====== Events Page Styles ====== */
+.events-container {
+  padding: 30px;
+  background-color: #f8faff;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Header Section */
+.events-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.events-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a237e;
+}
+
+/* Search Input */
+.search-input {
+  flex: 1;
+  min-width: 250px;
+  margin: 10px 10px;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #1a237e;
+}
+
+/* Sort Button */
+.sort-btn {
+  background-color: #1a237e;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.sort-btn:hover {
+  background-color: #303f9f;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Header */
+thead {
+  background-color: #1a237e;
+  color: #ffffff;
+}
+
+thead th {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Table Rows */
+tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #f1f4ff;
+}
+
+/* Table Data */
+td {
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Empty State */
+tbody tr td[colspan="4"] {
+  text-align: center;
+  padding: 40px 0;
+  color: #757575;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .events-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sort-btn {
+    margin-top: 10px;
+  }
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    margin-bottom: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #1a237e;
+  }
+
+  td:last-child {
+    border-bottom: none;
+  }
+}
