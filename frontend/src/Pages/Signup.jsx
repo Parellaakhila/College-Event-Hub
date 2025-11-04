@@ -22,7 +22,7 @@ function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
 
-  // ✅ Handle input change
+  // ✅ Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -33,10 +33,11 @@ function Signup() {
     if (passwordError) setPasswordError("");
   };
 
-  // ✅ Handle form submit with role-based redirect
+  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // 🔐 Password validations
     if (formData.password !== confirmPassword) {
       setPasswordError("Passwords do not match!");
       notifyError("Passwords do not match!");
@@ -50,24 +51,18 @@ function Signup() {
     }
 
     try {
-      // ✅ Convert role to lowercase before sending
+      // ✅ Prepare data (role in lowercase for backend)
       const payload = { ...formData, role: formData.role.toLowerCase() };
 
-      const res = await api.post("/auth/signup", payload);
-      notifySuccess("Signup successful!");
+      // ✅ Send signup request
+      await api.post("/auth/signup", payload);
 
-      // ✅ Save user info locally
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      notifySuccess("Signup successful! Please log in to continue.");
 
-      // ✅ Role-based redirect
-      const role = res.data.user.role?.toLowerCase();
-      if (role === "admin") {
-        navigate("/admin"); // Admin dashboard
-      } else {
-        navigate("/student-dashboard"); // Student dashboard
-      }
+      // ✅ Clear user info (just in case)
+      localStorage.removeItem("user");
 
-      // ✅ Reset fields
+      // ✅ Reset form fields
       setFormData({
         fullName: "",
         email: "",
@@ -76,13 +71,16 @@ function Signup() {
         college: "",
       });
       setConfirmPassword("");
+
+      // ✅ Redirect to login page
+      navigate("/login");
     } catch (err) {
       console.error("Signup Error:", err);
       notifyError(err.response?.data?.message || "Error signing up");
     }
   };
 
-  // ✅ Navigate to login
+  // ✅ Navigate to login manually
   const goToLogin = () => {
     navigate("/login");
   };

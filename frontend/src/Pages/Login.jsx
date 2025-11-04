@@ -15,7 +15,10 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // ✅ Handle input changes
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
     setFormData((prev) => ({
@@ -24,19 +27,17 @@ function Login() {
     }));
   };
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
+  // ✅ Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     if (!formData.email || !formData.password) {
-  notifyError("Please enter both email and password!");
-  setLoading(false);
-  return;
-}
+      notifyError("Please enter both email and password!");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await api.post("/auth/login", {
@@ -44,34 +45,48 @@ function Login() {
         password: formData.password,
       });
 
-      // Store the token
+      // ✅ Save token & user details
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       notifySuccess("Login successful!");
-      // Reset form and navigate to home
+
+      // ✅ Role-based navigation
+      const role = response.data.user.role?.toLowerCase();
+
+      if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "student") {
+        navigate("/student-dashboard");
+      } else if (role === "faculty") {
+        navigate("/faculty-dashboard");
+      } else {
+        navigate("/"); // fallback
+      }
+
+      // ✅ Reset form
       setFormData({
         email: "",
         password: "",
         rememberMe: false,
       });
-
-      navigate("/");
     } catch (err) {
-        notifyError(
-          err.response?.data?.message || "Failed to login. Please try again."
-        );
+      console.error("Login Error:", err);
+      notifyError(
+        err.response?.data?.message || "Failed to login. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Forgot Password
   const handleForgotPassword = () => {
     navigate("/forgot-password");
   };
 
+  // ✅ Go to Signup
   const handleCreateAccount = () => {
-    // navigation logic
     navigate("/signup");
   };
 
@@ -89,6 +104,7 @@ function Login() {
           </p>
 
           <form onSubmit={handleSubmit}>
+            {/* Email */}
             <input
               type="email"
               name="email"
@@ -99,6 +115,7 @@ function Login() {
               required
             />
 
+            {/* Password */}
             <div className="login-password-wrapper">
               <input
                 type={showPassword ? "text" : "password"}
@@ -123,6 +140,7 @@ function Login() {
               </button>
             </div>
 
+            {/* Remember Me + Forgot Password */}
             <div className="remember-forgot-row">
               <div className="remember-me">
                 <input
@@ -139,6 +157,8 @@ function Login() {
                 Forgot Password?
               </span>
             </div>
+
+            {/* Submit Button */}
             <button type="submit" disabled={loading}>
               {loading ? "Signing in..." : "Sign in"}
             </button>
@@ -146,6 +166,7 @@ function Login() {
         </div>
       </div>
 
+      {/* Right Section (Illustration) */}
       <div className="login-right">
         <img src={loginImage} alt="Students illustration" />
       </div>

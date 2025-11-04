@@ -30,7 +30,7 @@ const CreateEvent = () => {
     const data = await res.json();
     if (data.success) {
       alert("✅ Event created successfully!");
-      navigate("/admin-dashboard"); // or your dashboard route
+      navigate("/admin"); // or your dashboard route
     } else {
       alert("❌ Failed to create event!");
     }
