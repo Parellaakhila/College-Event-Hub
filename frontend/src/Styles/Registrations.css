@@ -1,0 +1,240 @@
+/* === Registrations Page Themed Styles === */
+
+/* Panel Style (Copied from AdminDashboard) */
+.panel {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    font-family: "Poppins", sans-serif;
+    margin-top: 20px;
+    /* Assuming this font is used */
+}
+
+.panel h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Table Wrapper (for overflow) */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Table (Themed like .activity-table) */
+.registrations-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.registrations-table th,
+.registrations-table td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    /* Dashboard light border */
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.registrations-table th {
+    background-color: #0757DB;
+    /* Your theme's blue header */
+    color: #fafcfd;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.registrations-table tbody tr:hover {
+    background-color: #fafbfc;
+    /* Dashboard row hover */
+}
+
+/* Style the first cell to be bold */
+.registrations-table td:first-child {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Empty State */
+.no-registrations-found {
+    text-align: center;
+    padding: 40px 0;
+    color: #0757DB;
+    /* Your theme's blue */
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .panel {
+        padding: 15px;
+    }
+
+    .registrations-table,
+    .registrations-table thead,
+    .registrations-table tbody,
+    .registrations-table th,
+    .registrations-table td,
+    .registrations-table tr {
+        display: block;
+    }
+
+    .registrations-table thead {
+        display: none;
+    }
+
+    .registrations-table tbody tr {
+        margin-bottom: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        /* Themed shadow */
+        padding: 15px;
+        border-bottom: none;
+    }
+
+    .registrations-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        /* Themed light border */
+    }
+
+    /* Use the new theme color */
+    .registrations-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #0757DB;
+        /* Dashboard primary blue */
+        padding-right: 10px;
+    }
+
+    .registrations-table td:last-child {
+        border-bottom: none;
+    }
+}
+.registrations-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.registrations-table th,
+.registrations-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.approve-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.reject-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.approve-btn:hover {
+  background-color: #0056b3;
+}
+
+.reject-btn:hover {
+  background-color: #5a6268;
+}
+
+.status-approved {
+  color: green;
+  font-weight: 600;
+}
+
+.status-rejected {
+  color: red;
+  font-weight: 600;
+}
+
+.status-pending {
+  color: orange;
+  font-weight: 600;
+}
+/* ===== Action Buttons (Approve / Reject) ===== */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Modern blue Approve button */
+.approve-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+.approve-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+/* Sleek gray Reject button */
+.reject-btn {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(107, 114, 128, 0.25);
+}
+
+.reject-btn:hover {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.35);
+}
+
+/* Status text colors */
+.status-approved {
+  color: #16a34a; /* green */
+  font-weight: 600;
+}
+
+.status-rejected {
+  color: #dc2626; /* red */
+  font-weight: 600;
+}
+
+.status-pending {
+  color: #f59e0b; /* amber */
+  font-weight: 600;
+}

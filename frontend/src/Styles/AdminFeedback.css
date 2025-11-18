@@ -1,0 +1,176 @@
+/* ===== Admin Feedbacks Wrapper ===== */
+.admin-feedback-container {
+  padding: 30px;
+  background: #f9fafb;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ===== Header ===== */
+.feedback-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.feedback-subtitle {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* ===== Search Bar ===== */
+.feedback-search-container {
+  margin: 20px 0;
+}
+
+.feedback-search-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.25s;
+}
+
+.feedback-search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* ===== Table Wrapper ===== */
+.feedback-table-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+/* ===== Table ===== */
+.feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.feedback-table thead {
+  background: #2563eb;
+  color: white;
+}
+
+.feedback-table th,
+.feedback-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.feedback-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+.feedback-comments {
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* ===== Delete Button ===== */
+.feedback-delete-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.feedback-delete-btn:hover {
+  color: #b91c1c;
+}
+
+/* ===== Empty State ===== */
+.feedback-empty {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== Delete Modal ===== */
+.feedback-delete-modal {
+  background: white;
+  width: 380px;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #6b7280;
+  cursor: pointer;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.modal-warning {
+  color: #dc2626;
+  margin-top: 5px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-delete-btn {
+  background: #dc2626;
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-delete-btn:hover {
+  background: #b91c1c;
+}
+
+.modal-cancel-btn {
+  background: #6b7280;
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-cancel-btn:hover {
+  background: #4b5563;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

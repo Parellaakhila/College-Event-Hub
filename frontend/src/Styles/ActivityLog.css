@@ -1,0 +1,122 @@
+/* === Activity Log Page Themed Styles === */
+
+/* Panel Style (Copied from AdminDashboard) */
+.panel {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    font-family: "Poppins", sans-serif;
+    /* Assuming this font is used */
+}
+
+.panel h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Table Wrapper (for overflow) */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Table (Themed like .activity-table) */
+.activity-log-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.activity-log-table th,
+.activity-log-table td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    /* Dashboard light border */
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.activity-log-table th {
+    background-color: #0757DB;
+    /* Your theme's blue header */
+    color: #fafcfd;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-log-table tbody tr:hover {
+    background-color: #fafbfc;
+    /* Dashboard row hover */
+}
+
+/* Style the first cell to be bold */
+.activity-log-table td:first-child {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Empty State */
+.no-activity-found {
+    text-align: center;
+    padding: 40px 0;
+    color: #0757DB;
+    /* Your theme's blue */
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .panel {
+        padding: 15px;
+    }
+
+    .activity-log-table,
+    .activity-log-table thead,
+    .activity-log-table tbody,
+    .activity-log-table th,
+    .activity-log-table td,
+    .activity-log-table tr {
+        display: block;
+    }
+
+    .activity-log-table thead {
+        display: none;
+    }
+
+    .activity-log-table tbody tr {
+        margin-bottom: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        /* Themed shadow */
+        padding: 15px;
+        border-bottom: none;
+    }
+
+    .activity-log-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+        /* Themed light border */
+    }
+
+    /* Use the new theme color */
+    .activity-log-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #0757DB;
+        /* Dashboard primary blue */
+        padding-right: 10px;
+    }
+
+    .activity-log-table td:last-child {
+        border-bottom: none;
+    }
+}
