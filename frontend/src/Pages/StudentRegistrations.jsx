@@ -23,7 +23,10 @@ import {
 const StudentRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
   const [student, setStudent] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const [sidebarOpen, setSidebarOpen] = useState(
+  localStorage.getItem("sidebarOpen") === "true"
+);
+
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -36,7 +39,6 @@ const StudentRegistrations = () => {
   const location = useLocation();
   const profileRef = useRef(null);
 
-  // Load student info
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -51,7 +53,6 @@ const StudentRegistrations = () => {
     }
   }, [navigate]);
 
-  // Load theme
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     const isDark = saved === "true";
@@ -59,7 +60,6 @@ const StudentRegistrations = () => {
     document.documentElement.classList.toggle("dark", isDark);
   }, []);
 
-  // Fetch registrations
   useEffect(() => {
     if (!student?.email) return;
     const fetchRegistrations = async () => {
@@ -76,8 +76,11 @@ const StudentRegistrations = () => {
     };
     fetchRegistrations();
   }, [student?.email]);
+  
+useEffect(() => {
+  localStorage.setItem("sidebarOpen", sidebarOpen);
+}, [sidebarOpen]);
 
-  // Notifications: compute approved registrations that user hasn't "seen"
   const getApprovedIds = (regs = registrations) =>
     regs.filter((r) => r.status === "Approved" && r.eventId).map((r) => r._id);
 
@@ -92,7 +95,6 @@ const StudentRegistrations = () => {
     setUnseenApprovedIds(unseen);
   }, [registrations, student?.email]);
 
-  // Toggle sidebar/profile etc
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleProfileMenu = () => setShowProfileMenu((s) => !s);
 
@@ -103,7 +105,6 @@ const StudentRegistrations = () => {
     document.documentElement.classList.toggle("dark", next);
   };
 
-  // Delete flow
   const confirmDelete = (id) => {
     setRegistrationToDelete(id);
     setDeleteModalOpen(true);
@@ -139,12 +140,10 @@ const StudentRegistrations = () => {
     }
   };
 
-  // Feedback
   const handleFeedback = (eventId) => {
     navigate(`/student/feedback/${eventId}`);
   };
 
-  // Notification clicking: show dropdown and mark seen
   const handleBellClick = () => {
     if (!student?.email) return;
     const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
@@ -192,8 +191,6 @@ const StudentRegistrations = () => {
   };
 
   const { past, ongoing, upcoming } = categorizeEvents();
-
-  // Filter registrations by search term
   const filterRegistrations = (regs) => {
     if (!searchTerm.trim()) return regs;
     const term = searchTerm.toLowerCase();
@@ -276,21 +273,18 @@ const StudentRegistrations = () => {
         <div className="sidebar-header">
           <h2>🎓 EventHub</h2>
         </div>
-
         <nav className="sidebar-menu">
-          <NavLink to="/student-dashboard" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
+          <NavLink to="/student-dashboard" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
             <FaHome style={{ marginRight: 10 }} /> Dashboard
           </NavLink>
-
-          <NavLink to="/student/events" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+         <NavLink to="/student/events" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaClipboardList style={{ marginRight: 10 }} /> Explore Events
           </NavLink>
-
-          <NavLink to="/student/registrations" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/registrations" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaCalendarAlt style={{ marginRight: 10 }} /> My Registrations
           </NavLink>
 
-          <NavLink to="/student/profile" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/profile" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaUserCircle style={{ marginRight: 10 }} /> Profile
           </NavLink>
         </nav>

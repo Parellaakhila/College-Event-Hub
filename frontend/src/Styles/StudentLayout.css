@@ -1,0 +1,77 @@
+/* src/Styles/StudentLayout.css */
+
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #2563eb;
+  color: white;
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  left: -260px;
+  top: 0;
+  transition: 0.3s ease;
+  z-index: 1000;
+  padding-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.menu-toggle {
+  font-size: 20px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.sidebar-menu {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-menu a {
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.sidebar-menu a:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.sidebar-menu a.active-link {
+  background: #0a66c2 !important;
+  padding-left: 15px;
+}
+
+/* Main content shifting when sidebar opens */
+.main-content {
+  flex: 1;
+  width: 100%;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+}
+.main-content.shifted {
+  margin-left: 250px;
+}

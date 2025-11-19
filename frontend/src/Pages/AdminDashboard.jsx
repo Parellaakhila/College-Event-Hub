@@ -68,7 +68,7 @@ const AdminDashboard = () => {
       sidebarOpen={sidebarOpen}
       toggleSidebar={toggleSidebar}
     >
-      {/* ✅ Main Dashboard Area */}
+
       <main >
         {/* Header */}
         <section className="modern-header">

@@ -14,9 +14,11 @@ import RegistrationsPage from "./Pages/RegistrationsPage";
 import FeedbackPage from "./Pages/FeedbackPage";
 import ActivityLogPage from "./Pages/ActivityLogPage";
 import EventRegistration from "./Pages/EventRegistration";
-import UserRegisterEvents from "./Pages/UserRegisterEvents";
+
 import AdminFeedbackPage from "./Pages/AdminFeedbackPage";
 import StudentRegistrations from "./Pages/StudentRegistrations";
+import StudentProfile from "./Pages/StudentProfile";
+import StudentLayout from "./Pages/StudentLayout";
 
 function App() {
 
@@ -39,12 +41,18 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin" element={<AdminDashboard/>}/>
         <Route path="/admin/events" element={<EventsPage userRole="admin" />} />
-<Route path="/student/events" element={<EventsPage userRole="student" />} />
-<Route path="/student/feedback/:eventId" element={<FeedbackPage />} />
+        <Route path="/student/events" element={<EventsPage userRole="student" />} />
+        <Route path="/student/feedback/:eventId" element={<FeedbackPage />} />
         <Route path="/admin/registrations" element={<RegistrationsPage />} />
-        <Route path="/student/my-events" element={<UserRegisterEvents />} />
         <Route path="/student/registrations" element={<StudentRegistrations />} />
-
+       <Route
+  path="/student/profile"
+  element={
+    <StudentLayout>
+      <StudentProfile />
+    </StudentLayout>
+  }
+/>
         <Route path="/admin/feedbacks" element={<AdminFeedbackPage />} />
         <Route path="/admin/activity" element={<ActivityLogPage />} />
         <Route path="/student-dashboard" element={<StudentDashboard/>}/>

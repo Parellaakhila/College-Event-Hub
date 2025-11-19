@@ -1,132 +1,229 @@
-/* src/pages/HomePage.css */
+/* ---------- GLOBAL ---------- */
+.home-wrapper {
+  font-family: "Poppins", sans-serif;
+  background: #ffffff;
+  overflow-x: hidden;
+}
 
-.home-container {
-    font-family: "Poppins", sans-serif;
-    color: #333;
-    min-height: 100vh;
-    background-color: #fff;
+/* ============ NAVBAR ============ */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 60px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* LOGO */
+.nav-logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #007bff;
+}
+
+/* MOBILE TOGGLE */
+.nav-toggle { 
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* LINKS */
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #333;
+}
+
+.nav-actions { display: flex; gap: 12px; }
+
+/* HIDE ON MOBILE */
+.nav-actions-mobile { display: none; }
+
+/* ========= MOBILE MENU ========= */
+@media (max-width: 900px) {
+  .nav {
+    padding: 15px 25px;
   }
-  
-  /* Navbar */
-  .navbar {
+
+  .nav-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 65px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background: white;
+    padding: 20px 0;
+    border-bottom: 1px solid #ddd;
+    display: none;
+  }
+
+  .nav-links.active {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 60px;
-    border-bottom: 1px solid #eee;
-    background-color: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-   
   }
-  
-  .nav-left .nav-item {
-    margin-right: 25px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  
-  .nav-left .nav-item:hover {
-    color: #007bff;
-  }
-  
-  .btn-login {
-    border: 1px solid #ccc;
-    background: transparent;
-    padding: 6px 14px;
-    border-radius: 5px;
-    margin-right: 10px;
-    cursor: pointer;
-    color: #fff;
-    background-color: #007bff;
-  }
-  
-  .btn-login:hover {
-    background-color: #340cc7;
-  }
-  
-  .btn-signup {
-    background-color: #007bff;
-    color: white;
-    padding: 6px 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .btn-signup:hover {
-    background-color: #005fcc;
-  }
-  
-  /* Hero Section */
-  .hero {
-    position: relative;
+
+  .nav-actions { display: none; }
+  .nav-actions-mobile { display: flex; gap: 10px; margin-top: 15px; flex-direction: column; width: 100%; padding: 0 20px; }
+  .nav-actions-mobile button { width: 100%; }
+}
+
+
+/* BUTTONS */
+.btn-primary {
+  background: #007bff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: #005fcc;
+}
+
+.btn-outline {
+  border: 2px solid #007bff;
+  color: #007bff;
+  background: transparent;
+  padding: 7px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+/* ---------- HERO SECTION ---------- */
+.hero-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 60px;
+  background: #9cc9f9;;
+}
+
+.hero-left {
+  max-width: 540px;
+  animation: fadeUp 0.8s ease;
+}
+
+.hero-left h1 {
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.hero-left h1 span {
+  color: #007bff;
+}
+
+.hero-left p {
+  margin-top: 14px;
+  color: #555;
+  font-size: 17px;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.hero-right img {
+  width: 480px;
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* ---------- FEATURES ---------- */
+.features {
+  padding: 70px 60px;
+  text-align: center;
+}
+
+.features h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.feature-card {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  transition: 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+}
+
+.feature-card img {
+  width: 120px;
+  margin-bottom: 15px;
+}
+
+.feature-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.feature-card p {
+  color: #666;
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+  text-align: center;
+  padding: 25px;
+  background:#9cc9f9;
+  color: #555;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-section {
+    flex-direction: column;
     text-align: center;
-    padding: 120px 20px;
   }
-  
-  .hero-bg {
-    background: url("/assets/blue-brush.png") no-repeat center;
-    background-size: contain;
-    width: 400px;
-    height: 280px;
-    margin: 0 auto;
-    opacity: 0.8;
+  .hero-right img {
+    width: 350px;
+    margin-top: 30px;
   }
-  
-  .hero-content {
-    position: relative;
-    margin-top: -200px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+  .features-grid {
+    grid-template-columns: 1fr;
   }
-  
-  .hero-content h1 {
-    font-size: 42px;
-    font-weight: 700;
-    margin-bottom: 16px;
-  }
-  
-  .hero-content h1 span {
-    color: #007bff;
-  }
-  
-  .hero-content p {
-    color: #555;
-    margin-bottom: 30px;
-    line-height: 1.6;
-  }
-  
-  .hero-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .btn-primary:hover {
-    background-color: #005fcc;
-  }
-  
-  .btn-link {
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-weight: 500;
-    text-decoration: underline;
-  }
-  
+}

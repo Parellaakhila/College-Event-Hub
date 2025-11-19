@@ -1,11 +1,4 @@
-/* ==========================
-   StudentDashboard.css
-   Updated: align hero/header with main content and sidebar
-   ========================== */
 
-/* ==========================
-   Theme variables (light by default)
-   ========================== */
 :root {
   --bg: #f9fafc;
   --panel: #ffffff;
@@ -62,6 +55,7 @@ body {
   overflow-x: hidden;
 }
 
+
 /* ==========================
    Sidebar
    ========================== */
@@ -116,11 +110,8 @@ body {
   transform: translateY(-2px);
 }
 
-/* ==========================
-   Main content
-   - Use padding inside main-content so every child lines up with same left/right gutters.
-   - When sidebar is open we keep margin-left to move the whole area.
-   ========================== */
+
+
 .main-content {
   flex: 1;
   margin-left: 0;
@@ -779,5 +770,34 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
   .dashboard-header { padding: 22px; margin: 12px 0 16px 0; }
   .nav-center { padding: 0 8px; }
 }
+/* ---------- Pagination (added) ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+}
 
-/* end of file */
+.pagination button {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.15s ease;
+}
+
+.pagination button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--text);
+}
+

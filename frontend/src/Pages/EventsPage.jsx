@@ -60,7 +60,9 @@ const EventsPage = ({ userRole = "student" }) => {
   const modalRef = useRef(null);
 
   // Layout / Navbar / Sidebar states (for student)
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+ const [sidebarOpen, setSidebarOpen] = useState(
+  localStorage.getItem("sidebarOpen") === "true"
+);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -106,9 +108,6 @@ const EventsPage = ({ userRole = "student" }) => {
       .catch(() => setEvents([]));
   }, []);
 
-  // -----------------------
-  // Fetch student registrations (only for students)
-  // -----------------------
   useEffect(() => {
     if (!student?.email) return;
     fetch(`http://localhost:5000/api/registrations/student/${student.email}`)
@@ -125,9 +124,7 @@ const EventsPage = ({ userRole = "student" }) => {
       .catch(() => setRegistrations([]));
   }, [student?.email]);
 
-  // -----------------------
-  // Notifications: compute approved registrations that user hasn't "seen"
-  // -----------------------
+  
   const getApprovedIds = (regs = registrations) =>
     regs.filter((r) => r.status === "Approved" && r.eventId).map((r) => r._id);
 
@@ -142,9 +139,10 @@ const EventsPage = ({ userRole = "student" }) => {
     setUnseenApprovedIds(unseen);
   }, [registrations, student?.email]);
 
-  // -----------------------
-  // Toggle sidebar/profile etc
-  // -----------------------
+ useEffect(() => {
+  localStorage.setItem("sidebarOpen", sidebarOpen ? "true" : "false");
+}, [sidebarOpen]);
+
   const toggleSidebar = () => setSidebarOpen((s) => !s);
   const toggleProfileMenu = () => setShowProfileMenu((s) => !s);
 
@@ -532,9 +530,7 @@ const EventsPage = ({ userRole = "student" }) => {
     </div>
   );
 
-  // -----------------------
-  // Categorize events for student view
-  // -----------------------
+ 
   const categorizeEvents = () => {
     const now = new Date();
     const past = [];
@@ -569,9 +565,6 @@ const EventsPage = ({ userRole = "student" }) => {
 
   const { past, ongoing, upcoming } = categorizeEvents();
 
-  // -----------------------
-  // Student inner UI (keeps your styles)
-  // -----------------------
   const EventCategorySection = ({ title, events, colorClass }) => {
     if (events.length === 0) return null;
     return (
@@ -640,9 +633,6 @@ const EventsPage = ({ userRole = "student" }) => {
     </>
   );
 
-  // -----------------------
-  // Navbar bell click: mark seen & toggle dropdown
-  // -----------------------
   const handleBellClick = () => {
     if (!student?.email) return;
     const approved = getApprovedIds();
@@ -653,9 +643,7 @@ const EventsPage = ({ userRole = "student" }) => {
     setShowNotifDropdown((s) => !s);
   };
 
-  // -----------------------
-  // When modal opens/closes, lock body scroll
-  // -----------------------
+
   useEffect(() => {
     if (showRegsModal || showDeleteModal) {
       document.body.classList.add("modal-open");
@@ -668,9 +656,6 @@ const EventsPage = ({ userRole = "student" }) => {
     };
   }, [showRegsModal, showDeleteModal]);
 
-  // -----------------------
-  // RENDER: admin vs student
-  // -----------------------
   if (userRole === "admin") {
     return (
       <AdminLayout currentPath={location.pathname} onNavigate={(p) => navigate(p)}>
@@ -844,9 +829,6 @@ const EventsPage = ({ userRole = "student" }) => {
     );
   }
 
-  // -----------------------
-  // STUDENT LAYOUT: Sidebar + Navbar + Notifications + Profile
-  // -----------------------
   return (
     <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
       {/* Sidebar */}
@@ -856,19 +838,19 @@ const EventsPage = ({ userRole = "student" }) => {
         </div>
 
         <nav className="sidebar-menu">
-          <NavLink to="/student-dashboard" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
+          <NavLink to="/student-dashboard"  onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
             <FaHome style={{ marginRight: 10 }} /> Dashboard
           </NavLink>
 
-          <NavLink to="/student/events" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/events"   onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaClipboardList2 style={{ marginRight: 10 }} /> Explore Events
           </NavLink>
 
-          <NavLink to="/student/registrations" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/registrations"  onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaCalendarAlt style={{ marginRight: 10 }} /> My Registrations
           </NavLink>
 
-          <NavLink to="/student/profile" className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/profile"  onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaUserCircle style={{ marginRight: 10 }} /> Profile
           </NavLink>
         </nav>
