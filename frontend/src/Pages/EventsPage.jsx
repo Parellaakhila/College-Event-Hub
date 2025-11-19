@@ -915,7 +915,7 @@ const EventsPage = ({ userRole = "student" }) => {
             {/* profile */}
             <div className="profile-inline" onClick={toggleProfileMenu} ref={profileRef}>
               <div className="avatar"><FaUserCircle /></div>
-              <div className="profile-name">{student?.fullName || student?.name || "Student"}</div>
+            
             </div>
 
             {showProfileMenu && (
