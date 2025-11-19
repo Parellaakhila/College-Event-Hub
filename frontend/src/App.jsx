@@ -17,8 +17,6 @@ import EventRegistration from "./Pages/EventRegistration";
 
 import AdminFeedbackPage from "./Pages/AdminFeedbackPage";
 import StudentRegistrations from "./Pages/StudentRegistrations";
-import StudentProfile from "./Pages/StudentProfile";
-import StudentLayout from "./Pages/StudentLayout";
 
 function App() {
 
@@ -45,14 +43,6 @@ function App() {
         <Route path="/student/feedback/:eventId" element={<FeedbackPage />} />
         <Route path="/admin/registrations" element={<RegistrationsPage />} />
         <Route path="/student/registrations" element={<StudentRegistrations />} />
-       <Route
-  path="/student/profile"
-  element={
-    <StudentLayout>
-      <StudentProfile />
-    </StudentLayout>
-  }
-/>
         <Route path="/admin/feedbacks" element={<AdminFeedbackPage />} />
         <Route path="/admin/activity" element={<ActivityLogPage />} />
         <Route path="/student-dashboard" element={<StudentDashboard/>}/>

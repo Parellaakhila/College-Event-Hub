@@ -274,17 +274,25 @@ useEffect(() => {
           <h2>🎓 EventHub</h2>
         </div>
         <nav className="sidebar-menu">
-          <NavLink to="/student-dashboard" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
+          <NavLink to="/student-dashboard" onClick={() => {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
             <FaHome style={{ marginRight: 10 }} /> Dashboard
           </NavLink>
-         <NavLink to="/student/events" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+         <NavLink to="/student/events" onClick={() =>  {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }}className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaClipboardList style={{ marginRight: 10 }} /> Explore Events
           </NavLink>
-          <NavLink to="/student/registrations" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/registrations" onClick={() =>  {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaCalendarAlt style={{ marginRight: 10 }} /> My Registrations
           </NavLink>
 
-          <NavLink to="/student/profile" onClick={() => setSidebarOpen(true)} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <NavLink to="/student/profile" onClick={() => {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
             <FaUserCircle style={{ marginRight: 10 }} /> Profile
           </NavLink>
         </nav>

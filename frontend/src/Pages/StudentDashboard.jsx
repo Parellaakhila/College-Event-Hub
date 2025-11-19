@@ -216,17 +216,22 @@ const StudentDashboard = () => {
 
         <nav className="sidebar-menu">
           <NavLink
-            to="/student-dashboard"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => setSidebarOpen(true)}
-          >
-            <FaHome /> Dashboard
-          </NavLink>
+  to="/student-dashboard"
+  className={({ isActive }) => (isActive ? "active-link" : "")}
+  onClick={() => {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }}
+>
+  <FaHome /> Dashboard
+</NavLink>
+
 
           <NavLink
             to="/student/events"
             className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => setSidebarOpen(true)}
+            onClick={() =>  {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }}
           >
             <FaClipboardList /> Explore Events
           </NavLink>
@@ -234,7 +239,9 @@ const StudentDashboard = () => {
           <NavLink
             to="/student/registrations"
             className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }}
           >
             <FaCalendarAlt /> My Registrations
           </NavLink>
@@ -242,7 +249,9 @@ const StudentDashboard = () => {
           <NavLink
             to="/student/profile"
             className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => {
+    if (window.innerWidth <= 1100) setSidebarOpen(false);
+  }}
           >
             <FaUserCircle /> Profile
           </NavLink>
@@ -321,7 +330,7 @@ const StudentDashboard = () => {
             <div className="profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <FaUserCircle className="profile-icon" />
               <div className="profile-info">
-                <p className="name">{student.name}</p>
+                {/* <p className="name">{student.name}</p> */}
               </div>
             </div>
 

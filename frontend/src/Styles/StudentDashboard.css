@@ -499,11 +499,14 @@ body {
   border: 2px dashed rgba(37, 99, 235, 0.2);
 }
 
-/* responsive grids */
-@media (max-width: 1024px) {
+
+@media (max-width: 1100px) {
   .upcoming-grid,
-  .registrations-grid { grid-template-columns: repeat(2, 1fr); }
+  .registrations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
 @media (max-width: 620px) {
   .upcoming-grid,
   .registrations-grid { grid-template-columns: 1fr; }
@@ -801,3 +804,9 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
   color: var(--text);
 }
 
+/* 🔥 FIX: On tablet/mobile, sidebar should NOT shift layout */
+@media (max-width: 1100px) {
+  .main-content.shifted {
+    margin-left: 0 !important;
+  }
+}
