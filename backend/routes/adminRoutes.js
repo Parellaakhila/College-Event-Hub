@@ -9,6 +9,7 @@ import {
   updateRegistrationStatus,
   getFeedbacks,
   getRecentActivity,
+  submitFeedback, checkFeedback
 } from "../controllers/adminControllers.js";
 import { adminOnly, protect } from "../middleware/auth.js";
 
@@ -29,7 +30,8 @@ router.put("/registrations/:id", updateRegistrationStatus);
 
 // Feedback
 router.get("/feedbacks", getFeedbacks);
-
+router.post("/feedback", submitFeedback);
+router.get("/feedback/:eventId/:email", checkFeedback);
 // Activity Log
 router.get("/activity", getRecentActivity);
 router.get("/stats", protect, adminOnly, getDashboardStats);

@@ -107,6 +107,17 @@ const AdminLayout = ({
       clearInterval(interval);
     };
   }, []);
+// 🖥️ Keep sidebar always open on desktop
+useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth > 1100) {
+      setSidebarOpen(true); 
+    }
+  };
+  window.addEventListener("resize", handleResize);
+  handleResize();
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
   const handleNotifClick = () => {
     setNotifOpen(false);
@@ -134,8 +145,9 @@ const AdminLayout = ({
         onNavigate={onNavigate}
         currentPath={currentPath}
       />
-      {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar} />}
-
+     {sidebarOpen && window.innerWidth <= 1100 && (
+  <div className="sidebar-overlay" onClick={closeSidebar} />
+)}
       <main className="main-content">
         <header className="topbar">
           <div className="left-controls">

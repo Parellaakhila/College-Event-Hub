@@ -248,10 +248,13 @@ useEffect(() => {
               </button>
             )}
             {colorClass === "past" && (
-              <button className="feedback-inline-btn" onClick={() => handleFeedback(reg.eventId?._id)} title="Leave feedback">
-                <FaCommentDots /> Feedback
-              </button>
-            )}
+  <button className="feedback-inline-btn" 
+    onClick={() => handleFeedback(reg.eventId?._id)}
+    title={reg.feedbackGiven ? "Edit feedback" : "Leave feedback"}>
+    <FaCommentDots /> {reg.feedbackGiven ? "Edit Feedback" : "Feedback"}
+  </button>
+)}
+
           </div>
         </div>
       </div>

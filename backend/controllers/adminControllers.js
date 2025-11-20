@@ -78,15 +78,15 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-// 🟢 Get Registrations
 export const getRegistrations = async (req, res) => {
   try {
-    const registrations = await Registration.find().populate("eventId", "title date");
+    const registrations = await Registration.find().populate("eventId"); 
     res.json(registrations);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // 🟢 Approve / Reject Registration
 export const updateRegistrationStatus = async (req, res) => {
@@ -137,4 +137,54 @@ export const getRecentActivity = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+// ====================== FEEDBACK SUBMIT / UPDATE ======================
+export const submitFeedback = async (req, res) => {
+  try {
+    const { eventId, name, email, rating, comments } = req.body;
 
+    const cleanedEmail = email.toLowerCase(); // 🔥 IMPORTANT
+
+    // Check if feedback already exists
+    let existing = await Feedback.findOne({ eventId, email: cleanedEmail });
+
+    if (existing) {
+      existing.rating = rating;
+      existing.comments = comments;
+      await existing.save();
+
+      await Registration.updateOne(
+        { eventId, studentEmail: cleanedEmail },
+        { $set: { feedbackGiven: true } }
+      );
+
+      return res.json({ success: true, message: "Feedback updated" });
+    }
+
+    // Create new feedback
+    await Feedback.create({ eventId, name, email: cleanedEmail, rating, comments });
+
+    await Registration.updateOne(
+      { eventId, studentEmail: cleanedEmail },
+      { $set: { feedbackGiven: true } }
+    );
+
+    res.json({ success: true, message: "Feedback submitted" });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+// ====================== CHECK IF FEEDBACK EXISTS ======================
+export const checkFeedback = async (req, res) => {
+  try {
+    const { eventId, email } = req.params;
+    const cleanedEmail = email.toLowerCase(); // 🔥 IMPORTANT
+
+    const feedback = await Feedback.findOne({ eventId, email: cleanedEmail });
+    res.json({ feedback });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

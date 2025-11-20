@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const registrationSchema = new mongoose.Schema(
   {
     eventId: {
@@ -21,6 +20,9 @@ const registrationSchema = new mongoose.Schema(
       enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
     },
+
+    // 👉 Add this field
+    feedbackGiven: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
