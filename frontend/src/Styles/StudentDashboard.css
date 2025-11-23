@@ -12,7 +12,6 @@
   --elev-2: rgba(2,6,23,0.12);
 }
 
-/* Dark theme overrides (applied by JS via `document.documentElement.classList.toggle('dark')`) */
 :root.dark {
   --bg: #071024;
   --panel: #0f1724;
@@ -26,9 +25,6 @@
   --elev-2: rgba(2,6,23,0.32);
 }
 
-/* ==========================
-   Base / Global
-   ========================== */
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
@@ -41,12 +37,8 @@ body {
   transition: background-color 220ms ease, color 220ms ease;
 }
 
-/* Utility */
 .hidden { display: none !important; }
 
-/* ==========================
-   Layout
-   ========================== */
 .dashboard-container {
   display: flex;
   background: var(--bg);
@@ -55,10 +47,6 @@ body {
   overflow-x: hidden;
 }
 
-
-/* ==========================
-   Sidebar
-   ========================== */
 .sidebar {
   background: var(--primary);
   color: white;
@@ -110,30 +98,23 @@ body {
   transform: translateY(-2px);
 }
 
-
-
 .main-content {
   flex: 1;
   margin-left: 0;
   transition: margin-left 0.3s ease;
   width: 100%;
-  /* THE IMPORTANT PART: consistent left/right gutters */
   padding: 20px;
 }
 .main-content.shifted {
-  margin-left: 250px; /* push everything right when sidebar open */
+  margin-left: 250px;
 }
 
-/* ==========================
-   Navbar
-   ========================== */
-/* removed fixed left/right margins — navbar will rely on main-content padding for alignment */
 .navbar {
   background: var(--panel);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0; /* vertical padding only, horizontal handled by main-content */
+  padding: 12px 0;
   position: sticky;
   top: 0;
   z-index: 900;
@@ -149,9 +130,6 @@ body {
 }
 .menu-icon { font-size: 20px; cursor: pointer; color: var(--primary); }
 
-/* ==========================
-   Search bar (center)
-   ========================== */
 .nav-center { flex: 1; display: flex; justify-content: center; padding: 0 10px; }
 .search-bar {
   background: #f3f4f6;
@@ -174,16 +152,12 @@ body {
 }
 .search-icon { color: #666; margin-right: 8px; }
 
-/* Dark adjustments to search (override earlier background) */
 :root.dark .search-bar {
   background: rgba(255,255,255,0.03) !important;
   box-shadow: none;
 }
 :root.dark .search-bar input { color: var(--text) !important; caret-color: var(--primary); }
 
-/* ==========================
-   Profile Area
-   ========================== */
 .nav-right {
   display: flex;
   align-items: center;
@@ -203,16 +177,12 @@ body {
 .profile-info .name { font-weight: 600; font-size: 13px; color: var(--text); }
 .profile-info .college { font-size: 11px; color: var(--muted); }
 
-/* Keep nav icons visible in dark mode */
 :root.dark .menu-icon,
 :root.dark .icon,
 :root.dark .profile-icon {
   color: var(--primary) !important;
 }
 
-/* ==========================
-   Profile dropdown
-   ========================== */
 .profile-dropdown {
   position: absolute;
   top: 58px;
@@ -240,7 +210,6 @@ body {
   color: var(--primary);
 }
 
-/* Dark mode profile dropdown */
 :root.dark .profile-dropdown {
   background: var(--panel) !important;
   color: var(--text) !important;
@@ -249,23 +218,19 @@ body {
 }
 :root.dark .profile-dropdown p:hover { background: rgba(255,255,255,0.03); color: var(--primary); }
 
-/* ==========================
-   Dashboard Hero Header (blue background)
-   - ALIGNMENT FIX: use 100% width inside main-content padding so left/right match nav
-   ========================== */
 .dashboard-header {
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1d4ed8 100%);
   color: #fff;
   padding: 40px 32px;
   border-radius: 20px;
-  margin: 20px 0 24px 0; /* horizontal margins removed so it aligns with main-content padding */
+  margin: 20px 0 24px 0; 
   display: flex;
   flex-direction: column;
   gap: 8px;
   box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
   position: relative;
   overflow: hidden;
-  width: 100%; /* ensure fills main-content width */
+  width: 100%; 
 }
 
 .dashboard-header::before {
@@ -292,7 +257,6 @@ body {
   filter: blur(50px);
 }
 
-/* center hero content and limit width */
 .dashboard-header .hero-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -302,7 +266,6 @@ body {
   z-index: 1;
 }
 
-/* welcome text */
 .welcome-text h2 {
   font-size: 28px;
   margin: 0 0 8px 0;
@@ -323,9 +286,6 @@ body {
   font-weight: 400;
 }
 
-/* ==========================
-   Stats Cards
-   ========================== */
 .stats-grid {
   display: flex;
   gap: 20px;
@@ -381,9 +341,6 @@ body {
   letter-spacing: 0.3px;
 }
 
-/* ==========================
-   Sections (use padding inside main-content already so remove extra side margins)
-   ========================== */
 .registrations-section,
 .upcoming-section {
   padding: 24px 28px;
@@ -391,7 +348,7 @@ body {
   background: var(--panel);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  margin: 0 0 24px 0; /* horizontal margins removed (alignment handled by main-content padding) */
+  margin: 0 0 24px 0; 
 }
 
 .section-header {
@@ -424,9 +381,6 @@ body {
   border-radius: 2px;
 }
 
-/* ==========================
-   View All Button
-   ========================== */
 .view-all {
   background: linear-gradient(135deg, #2563eb, #1e40af);
   color: white;
@@ -449,9 +403,6 @@ body {
 }
 .view-all:active { transform: translateY(0); }
 
-/* ==========================
-   Filter Buttons
-   ========================== */
 .filter-buttons {
   display: flex;
   gap: 10px;
@@ -474,10 +425,7 @@ body {
   border-color: var(--primary);
 }
 
-/* ==========================
-   Cards Grid
-   - widths controlled by main-content padding so left/right match header/nav
-   ========================== */
+
 .registrations-grid,
 .upcoming-grid {
   display: grid;
@@ -515,9 +463,6 @@ body {
   .search-bar { max-width: 260px; }
 }
 
-/* ==========================
-   Card styles
-   ========================== */
 .event-card,
 .upcoming-card {
   background: var(--panel);
@@ -538,7 +483,6 @@ body {
   border-color: rgba(37, 99, 235, 0.2);
 }
 
-/* image inside card */
 .event-card img,
 .upcoming-card img {
   width: 100%;
@@ -553,7 +497,6 @@ body {
   transform: scale(1.05);
 }
 
-/* content area */
 .event-info {
   padding: 18px 20px;
   display: flex;
@@ -579,7 +522,6 @@ body {
   line-height: 1.5;
 }
 
-/* Approved / Pending labels */
 .approved {
   color: #10b981;
   display: inline-flex;
@@ -603,9 +545,6 @@ body {
   font-size: 13px;
 }
 
-/* ==========================
-   Buttons in cards
-   ========================== */
 .btn {
   background: linear-gradient(135deg, #2563eb, #1e40af);
   color: #fff;
@@ -634,9 +573,6 @@ body {
   opacity: 0.7;
 }
 
-/* ==========================
-   Settings Modal
-   ========================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -672,7 +608,6 @@ body {
   font-weight: 600;
 }
 
-/* Dark-specific modal styling */
 :root.dark .modal-overlay { background: rgba(2,6,23,0.6); }
 :root.dark .settings-modal {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -687,7 +622,6 @@ body {
   box-shadow: none;
 }
 
-/* Dark adjustments */
 :root.dark .stat-card h2,
 :root.dark .stat-card p { color: #fff !important; }
 :root.dark .event-info h3 { color: var(--text); }
@@ -729,9 +663,6 @@ body {
 :root.dark .profile-dropdown p,
 :root.dark .section-header h2 { color: var(--text) !important; }
 
-/* ==========================
-   Accessibility & UX
-   ========================== */
 :focus { outline: 3px solid rgba(37,99,235,0.18); outline-offset: 2px; }
 body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropdown, .settings-modal, .search-bar, .modal-overlay {
   transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
@@ -744,7 +675,6 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Logout modal */
 .logout-modal {
   width: 340px;
   background: #fff;
@@ -767,13 +697,12 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
 .logout-modal .cancel-btn { background-color: #9ca3af; color: #fff; width:35%; }
 .logout-modal .save-btn { background-color: #0757db; color: #fff; }
 
-/* Small tweak: ensure hero and other sections stay flush with main-content on small screens */
 @media (max-width: 960px) {
   .main-content { padding: 16px; }
   .dashboard-header { padding: 22px; margin: 12px 0 16px 0; }
   .nav-center { padding: 0 8px; }
 }
-/* ---------- Pagination (added) ---------- */
+
 .pagination {
   display: flex;
   justify-content: center;
@@ -804,9 +733,186 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
   color: var(--text);
 }
 
-/* 🔥 FIX: On tablet/mobile, sidebar should NOT shift layout */
 @media (max-width: 1100px) {
   .main-content.shifted {
     margin-left: 0 !important;
   }
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  background: var(--panel);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.24);
+  width: 260px;
+  z-index: 1200;
+  animation: fadeIn 0.14s ease;
+  padding-bottom: 6px;
+}
+
+.notifications-dropdown h4 {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  color: var(--text);
+}
+
+.notif-list {
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.notif-item {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.notif-item:hover {
+  background: rgba(37,99,235,0.06);
+}
+
+.notif-item strong {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.notif-approved {
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.notif-item small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.no-notif {
+  text-align: center;
+  padding: 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
+}
+
+.theme-switch .switch {
+  width: 48px;
+  height: 24px;
+  background: #cbd5e1;
+  border-radius: 24px;
+  position: relative;
+  transition: background 0.25s ease;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.theme-switch .switch.on {
+  background: var(--primary);
+}
+
+.theme-switch .circle {
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+
+.theme-switch .switch.on .circle {
+  transform: translateX(24px);
+}
+.nav-switch {
+  transform: scale(0.8);
+  margin-right: 6px;
+}
+/* -------------------------------
+   SETTINGS MODAL UI FIX
+-------------------------------- */
+.settings-modal {
+  padding: 26px 28px !important;
+  width: 380px !important;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.settings-modal h3 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.settings-modal .flex-space {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.settings-modal .flex-space > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-modal .flex-space strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.settings-modal .desc {
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--muted);
+  font-weight: 500;
+}
+.settings-modal .theme-switch {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings-modal .theme-switch span {
+  min-width: 80px;
+}
+
+.settings-modal .modal-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.settings-modal .cancel-btn {
+  width: 100%;
+  background: #e5e7eb;
+  font-weight: 600;
+  color: #111;
+  padding: 10px 0;
+  border-radius: 8px;
 }

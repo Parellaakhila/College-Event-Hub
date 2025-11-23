@@ -1,6 +1,4 @@
-/* ===========================
-   DASHBOARD CONTAINER
-=========================== */
+
 .dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -10,9 +8,6 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* ===========================
-   SIDEBAR
-=========================== */
 .sidebar {
   width: 250px;
   background-color: #0757db;
@@ -57,7 +52,6 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Overlay for mobile sidebar */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -68,9 +62,6 @@
   z-index: 900;
 }
 
-/* ===========================
-   MAIN CONTENT
-=========================== */
 .main-content {
   flex: 1;
   margin-left: 0;
@@ -82,9 +73,6 @@
   margin-left: 250px;
 }
 
-/* ===========================
-   TOPBAR
-=========================== */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -111,10 +99,6 @@
   align-items: center;
   gap: 25px;
 }
-
-/* ===========================
-   NOTIFICATIONS
-=========================== */
 .notification {
   position: relative;
   cursor: pointer;
@@ -173,10 +157,6 @@
 .notif-dropdown div:last-child {
   border-bottom: none;
 }
-
-/* ===========================
-   🌟 MODERN PROFILE BUTTON & DROPDOWN
-=========================== */
 .profile {
   position: relative;
   cursor: pointer;
@@ -206,7 +186,6 @@
   transform: translateY(-2px) scale(1.05);
 }
 
-/* Ripple effect */
 .profile-icon::after {
   content: "";
   position: absolute;
@@ -225,7 +204,6 @@
   transition: 0s;
 }
 
-/* Dropdown */
 .profile-dropdown {
   position: absolute;
   top: 35px;
@@ -290,10 +268,6 @@
   box-shadow: 0 6px 20px rgba(7, 87, 219, 0.2);
   transform: translateY(-2px);
 }
-
-/* ===========================
-   MODALS (Edit / Logout)
-=========================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -413,9 +387,7 @@
 .logout-modal .save-btn:hover {
   box-shadow: 0 5px 14px rgba(239, 68, 68, 0.22);
 }
-/* ===========================
-   🔔 MODERN NOTIFICATION BUTTON
-=========================== */
+
 .notification {
   position: relative;
   display: flex;
@@ -443,7 +415,6 @@
   font-size: 1.3rem;
 }
 
-/* Badge */
 .notif-count {
   position: absolute;
   top: 8px;
@@ -457,7 +428,6 @@
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Dropdown */
 .notif-dropdown {
   position: absolute;
   top: 55px;
@@ -487,9 +457,6 @@
   color: #0757db;
 }
 
-/* ===========================
-   👤 MODERN PROFILE DROPDOWN
-=========================== */
 .profile {
   position: relative;
   cursor: pointer;
@@ -601,9 +568,7 @@
   transform: translateY(-2px);
 }
 
-/* ===========================
-   ✨ ANIMATIONS
-=========================== */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -698,4 +663,83 @@
 .main-content {
   position: relative;
   z-index: 0 !important;
+}
+/* ------------------------------------------
+   PROFESSIONAL ADMIN NOTIFICATION CARD
+-------------------------------------------*/
+.notif-dropdown {
+  padding: 0;
+  border-radius: 14px;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+  animation: floatUp 0.18s ease-out;
+  position: absolute !important;
+}
+
+.notif-item {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  cursor: pointer;
+}
+
+.notif-item:hover {
+  background: rgba(7,87,219,0.08) !important;
+}
+
+.notif-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notif-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(37,99,235,0.12);
+  color: #0757db;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.notif-event {
+  font-size: 13px;
+  margin-top: 4px;
+  color: #374151;
+}
+
+.no-notif {
+  text-align: center;
+  padding: 14px;
+  color: #777;
+  font-size: 14px;
+}
+
+.view-all {
+  padding: 10px 12px !important;
+  font-weight: 600;
+  text-align: center;
+  color: #0757db;
+  cursor: pointer;
+  background: rgba(7,87,219,0.08);
+}
+
+.view-all:hover {
+  background: rgba(7,87,219,0.14);
+}
+
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Prevent layout shift on click */
+.notification, .profile {
+  position: relative;
+  z-index: 500 !important;
 }

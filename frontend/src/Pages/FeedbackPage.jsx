@@ -10,7 +10,6 @@ const FeedbackPage = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
 
-  // Memoized user data
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("user"));
@@ -27,10 +26,9 @@ const FeedbackPage = () => {
     email: user?.email || "",
     rating: 0,
     comments: "",
-    _id: null // used to detect update mode
+    _id: null,
   });
 
-  // ===================== FETCH EVENT =====================
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -54,14 +52,11 @@ const FeedbackPage = () => {
         const res = await fetch(`http://localhost:5000/api/events/${eventId}`, {
           signal: controller.signal,
         });
-        if (!res.ok) throw new Error("Failed to fetch event");
-
         const data = await res.json();
+        if (!res.ok) throw new Error();
         setEvent(data.event || data);
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          toast.error("Event not found or server error", { position: "top-center" });
-        }
+      } catch {
+        toast.error("Event not found or server error", { position: "top-center" });
         setEvent(null);
       } finally {
         setLoading(false);
@@ -72,7 +67,7 @@ const FeedbackPage = () => {
     return () => controller.abort();
   }, [eventId, navigate, user]);
 
-  // ===================== CHECK EXISTING FEEDBACK =====================
+  // 🔵 CHECK EXISTING FEEDBACK
   useEffect(() => {
     const checkFeedback = async () => {
       if (!user?.email || !eventId) return;
@@ -90,6 +85,8 @@ const FeedbackPage = () => {
             comments: data.feedback.comments,
             _id: data.feedback._id,
           });
+
+          localStorage.setItem(`fb_${eventId}_${user.email}`, "true");
         }
       } catch (err) {
         console.error("Check feedback error:", err);
@@ -99,7 +96,6 @@ const FeedbackPage = () => {
     checkFeedback();
   }, [user?.email, eventId]);
 
-  // ===================== FORM CHANGE =====================
   const handleChange = (e) => {
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
@@ -108,7 +104,6 @@ const FeedbackPage = () => {
     setFormData((p) => ({ ...p, rating: value }));
   };
 
-  // ===================== SUBMIT / UPDATE FEEDBACK =====================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -127,7 +122,7 @@ const FeedbackPage = () => {
 
     try {
       const res = await fetch("http://localhost:5000/api/feedback", {
-        method: "POST", // same route updates automatically
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -135,6 +130,8 @@ const FeedbackPage = () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        localStorage.setItem(`fb_${eventId}_${formData.email}`, "true");
+
         toast.success(
           formData._id ? "✏️ Feedback Updated!" : "🎉 Feedback Submitted!",
           { position: "top-center", autoClose: 1500 }
@@ -147,7 +144,6 @@ const FeedbackPage = () => {
     }
   };
 
-  // ===================== RENDER =====================
   if (loading) {
     return (
       <div className="feedback-wrapper" style={{ minHeight: "60vh" }}>
@@ -171,20 +167,16 @@ const FeedbackPage = () => {
     );
   }
 
-  // ===================== UI =====================
   return (
     <div className="feedback-wrapper">
       <ToastContainer />
       <div className="feedback-card-container">
-
-        {/* LEFT: EVENT PREVIEW */}
         <div className="feedback-left">
           <img
             src={event.image || "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"}
             alt={event.title || "Event"}
           />
           <h2>{event.title || "Untitled Event"}</h2>
-          {event.collegeName && <p className="college">{event.collegeName}</p>}
           {event.description && <p className="desc">{event.description}</p>}
 
           <div className="meta">
@@ -193,7 +185,6 @@ const FeedbackPage = () => {
           </div>
         </div>
 
-        {/* RIGHT: FORM */}
         <form className="feedback-right" onSubmit={handleSubmit}>
           <h3>{formData._id ? "Edit Feedback" : "Submit Feedback"}</h3>
 
@@ -204,7 +195,7 @@ const FeedbackPage = () => {
           <input type="email" name="email" value={formData.email} readOnly />
 
           <label>Rating</label>
-          <div className="star-row" role="radiogroup" aria-label="Rating">
+          <div className="star-row">
             {[1, 2, 3, 4, 5].map((s) => (
               <FaStar
                 key={s}

@@ -501,3 +501,46 @@
     transform: translateY(0);
   }
 }
+/* 🌙🌞 Home Page Toggle Switch */
+.home-theme-switch {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.home-theme-switch input {
+  display: none;
+}
+
+.home-slider {
+  width: 100%;
+  height: 100%;
+  background: #cbd5e1;
+  border-radius: 24px;
+  display: block;
+  transition: 0.25s ease;
+  position: relative;
+}
+
+.home-slider::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: 0.25s ease;
+}
+
+/* Dark mode toggle action */
+.home-theme-switch input:checked + .home-slider {
+  background: var(--primary);
+}
+
+.home-theme-switch input:checked + .home-slider::before {
+  transform: translateX(24px);
+}

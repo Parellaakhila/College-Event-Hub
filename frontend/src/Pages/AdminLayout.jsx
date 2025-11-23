@@ -1,5 +1,6 @@
+// src/Pages/AdminLayout.jsx
 import React, { useState, useEffect } from "react";
-import { FaBell, FaEdit, FaSignOutAlt } from "react-icons/fa";
+import { FaBell, FaEdit, FaSignOutAlt, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "../Styles/AdminLayout.css";
@@ -21,7 +22,6 @@ const AdminLayout = ({
   const [notifications, setNotifications] = useState([]);
   const [notifCount, setNotifCount] = useState(0);
 
-  // ✅ Load user from localStorage
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser
@@ -35,17 +35,20 @@ const AdminLayout = ({
     college: user.college,
   });
 
-  // Sidebar toggle
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
-
-  // Notifications toggle
   const toggleNotif = () => setNotifOpen(!notifOpen);
-
-  // Profile dropdown toggle
   const toggleProfile = () => setProfileOpen(!profileOpen);
+  const handleLogout = () => setLogoutConfirmOpen(true);
 
-  // Edit Profile handlers
+  const confirmLogout = () => {
+    setLogoutConfirmOpen(false);
+    localStorage.removeItem("user");
+    onLogout();
+    navigate("/login");
+  };
+  const cancelLogout = () => setLogoutConfirmOpen(false);
+
   const handleEditChange = (e) =>
     setEditData({ ...editData, [e.target.name]: e.target.value });
 
@@ -56,50 +59,25 @@ const AdminLayout = ({
     setEditProfileOpen(false);
   };
 
-  // Logout handlers
-  const handleLogout = () => setLogoutConfirmOpen(true);
-  const confirmLogout = () => {
-    setLogoutConfirmOpen(false);
-    localStorage.removeItem("user");
-    onLogout();
-    navigate("/login");
-  };
-  const cancelLogout = () => setLogoutConfirmOpen(false);
-
-  // ✅ Fetch pending registrations every 10 seconds
   useEffect(() => {
     let mounted = true;
-
     const fetchNotifications = async () => {
       try {
         const res = await fetch(
           "http://localhost:5000/api/registrations/pending"
         );
-
-        if (!res.ok) {
-          console.error("❌ Failed to fetch notifications:", res.status);
-          if (mounted) {
-            setNotifications([]);
-            setNotifCount(0);
-          }
-          return;
-        }
-
         const data = await res.json();
-
         if (mounted) {
           setNotifications(data);
           setNotifCount(data.length);
         }
-      } catch (err) {
-        console.error("[AdminLayout] Error fetching notifications:", err);
+      } catch {
         if (mounted) {
           setNotifications([]);
           setNotifCount(0);
         }
       }
     };
-
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 10000);
     return () => {
@@ -107,24 +85,21 @@ const AdminLayout = ({
       clearInterval(interval);
     };
   }, []);
-// 🖥️ Keep sidebar always open on desktop
-useEffect(() => {
-  const handleResize = () => {
-    if (window.innerWidth > 1100) {
-      setSidebarOpen(true); 
-    }
-  };
-  window.addEventListener("resize", handleResize);
-  handleResize();
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1100) setSidebarOpen(true);
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleNotifClick = () => {
     setNotifOpen(false);
     navigate("/admin/registrations");
   };
 
-  // ✅ Generate gradient avatar for username
   const getGradient = (name) => {
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -145,22 +120,23 @@ useEffect(() => {
         onNavigate={onNavigate}
         currentPath={currentPath}
       />
-     {sidebarOpen && window.innerWidth <= 1100 && (
-  <div className="sidebar-overlay" onClick={closeSidebar} />
-)}
+
+      {sidebarOpen && window.innerWidth <= 1100 && (
+        <div className="sidebar-overlay" onClick={closeSidebar} />
+      )}
+
       <main className="main-content">
         <header className="topbar">
-          <div className="left-controls">
-            <button className="menu-icon" onClick={toggleSidebar}>
-              ☰
-            </button>
-          </div>
+          <button className="menu-icon" onClick={toggleSidebar}>
+            ☰
+          </button>
 
           <div className="right-controls">
             {/* 🔔 Notifications */}
             <div className="notification" onClick={toggleNotif}>
-              <FaBell size={20} />
+              <FaBell />
               {notifCount > 0 && <span className="notif-count">{notifCount}</span>}
+
               {notifOpen && (
                 <div className="notif-dropdown">
                   {notifCount > 0 ? (
@@ -171,30 +147,27 @@ useEffect(() => {
                           className="notif-item"
                           onClick={handleNotifClick}
                         >
-                          <strong>{notif.studentName}</strong> registered for{" "}
-                          <strong>{notif.eventName}</strong>
-                          <br />
+                          <div className="notif-top">
+                            <strong>{notif.studentName}</strong>
+                            <span className="notif-status">
+                              <FaCheckCircle /> Registered
+                            </span>
+                          </div>
+                          <p className="notif-event">
+                            Event: <b>{notif.eventName}</b>
+                          </p>
                           <small>
-                            {new Date(notif.timestamp).toLocaleString()}
+                            🕒 {new Date(notif.timestamp).toLocaleString()}
                           </small>
                         </div>
                       ))}
-                      <div
-                        className="view-all"
-                        onClick={handleNotifClick}
-                        style={{
-                          textAlign: "center",
-                          padding: "8px",
-                          cursor: "pointer",
-                          color: "#0757db",
-                          fontWeight: "bold",
-                        }}
-                      >
+
+                      <div className="view-all" onClick={handleNotifClick}>
                         View All Pending Approvals →
                       </div>
                     </>
                   ) : (
-                    <div>No new notifications</div>
+                    <div className="no-notif">No new notifications</div>
                   )}
                 </div>
               )}
@@ -202,10 +175,7 @@ useEffect(() => {
 
             {/* 👤 Profile */}
             <div className="profile" onClick={toggleProfile}>
-              <div
-                className="profile-avatar"
-                style={{ background: getGradient(user.fullName) }}
-              >
+              <div className="profile-avatar" style={{ background: getGradient(user.fullName) }}>
                 {userInitial}
               </div>
 
@@ -236,66 +206,35 @@ useEffect(() => {
 
         {children}
 
-        {/* ✏️ Edit Profile Modal */}
+        {/* ✏ Edit Profile */}
         {editProfileOpen && (
-          <div
-            className="modal-overlay"
-            onClick={() => setEditProfileOpen(false)}
-          >
-            <div
-              className="edit-profile-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="modal-overlay" onClick={() => setEditProfileOpen(false)}>
+            <div className="edit-profile-modal" onClick={(e) => e.stopPropagation()}>
               <h3>Edit Profile</h3>
               <label>Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                value={editData.fullName}
-                onChange={handleEditChange}
-              />
+              <input type="text" name="fullName" value={editData.fullName} onChange={handleEditChange} />
               <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={editData.email}
-                onChange={handleEditChange}
-              />
+              <input type="email" name="email" value={editData.email} onChange={handleEditChange} />
               <label>College</label>
-              <input
-                type="text"
-                name="college"
-                value={editData.college}
-                onChange={handleEditChange}
-              />
+              <input type="text" name="college" value={editData.college} onChange={handleEditChange} />
+
               <div className="modal-buttons">
-                <button className="save-btn" onClick={handleSaveProfile}>
-                  Save
-                </button>
-                <button
-                  className="cancel-btn"
-                  onClick={() => setEditProfileOpen(false)}
-                >
-                  Cancel
-                </button>
+                <button className="save-btn" onClick={handleSaveProfile}>Save</button>
+                <button className="cancel-btn" onClick={() => setEditProfileOpen(false)}>Cancel</button>
               </div>
             </div>
           </div>
         )}
 
-        {/* 🚪 Logout Confirmation Modal */}
+        {/* 🚪 Logout */}
         {logoutConfirmOpen && (
           <div className="modal-overlay" onClick={cancelLogout}>
             <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
               <h3>Confirm Logout</h3>
               <p>Are you sure you want to logout?</p>
               <div className="modal-buttons">
-                <button className="save-btn" onClick={confirmLogout}>
-                  Yes, Logout
-                </button>
-                <button className="cancel-btn" onClick={cancelLogout}>
-                  No, Stay
-                </button>
+                <button className="save-btn" onClick={confirmLogout}>Yes, Logout</button>
+                <button className="cancel-btn" onClick={cancelLogout}>No, Stay</button>
               </div>
             </div>
           </div>

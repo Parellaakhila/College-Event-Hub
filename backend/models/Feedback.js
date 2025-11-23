@@ -6,7 +6,7 @@ const feedbackSchema = new mongoose.Schema(
     name: { type: String, required: true },
   email: { type: String, required: true, lowercase: true },
     rating: { type: Number, required: true },
-    comments: { type: String, required: true }, // renamed from feedback
+    comments: { type: String, required: true }, 
   },
   { timestamps: true }
 );

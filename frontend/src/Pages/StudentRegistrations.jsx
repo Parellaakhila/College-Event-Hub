@@ -88,12 +88,25 @@ useEffect(() => {
   const [unseenApprovedIds, setUnseenApprovedIds] = useState([]);
 
   useEffect(() => {
-    if (!student?.email) return;
-    const approved = getApprovedIds();
-    const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
-    const unseen = approved.filter((id) => !seen.includes(id));
-    setUnseenApprovedIds(unseen);
-  }, [registrations, student?.email]);
+  if (!student?.email) return;
+  const fetchRegistrations = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/registrations/student/${student.email}`
+      );
+      const data = await res.json();
+
+      setRegistrations((data.registrations || data || []).map((r) => {
+        const key = `fb_${r.eventId?._id}_${student.email}`;
+        return { ...r, feedbackGiven: localStorage.getItem(key) === "true" };
+      }));
+    } catch (err) {
+      console.error("Error fetching registrations:", err);
+      setRegistrations([]);
+    }
+  };
+  fetchRegistrations();
+}, [student?.email]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleProfileMenu = () => setShowProfileMenu((s) => !s);

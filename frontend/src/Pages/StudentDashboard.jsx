@@ -12,8 +12,6 @@ import {
   FaCog,
   FaClock,
   FaCheckCircle,
-  FaMoon,
-  FaSun,
   FaClipboardList,
 } from "react-icons/fa";
 import { useNavigate, NavLink } from "react-router-dom";
@@ -28,12 +26,9 @@ const StudentDashboard = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  // Notification states
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [unseenApprovedIds, setUnseenApprovedIds] = useState([]);
 
-  // Pagination states
   const [regPage, setRegPage] = useState(1);
   const [upPage, setUpPage] = useState(1);
   const ITEMS_PER_PAGE = 3;
@@ -41,22 +36,21 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
-  // Load student from localStorage safely
+  // Load user
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
       if (!storedUser) return navigate("/login");
-      const parsedUser = JSON.parse(storedUser);
-      if (!parsedUser?.email) return navigate("/login");
-      setStudent(parsedUser);
-    } catch (err) {
-      console.error("Invalid user data in localStorage", err);
+      const parsed = JSON.parse(storedUser);
+      if (!parsed?.email) return navigate("/login");
+      setStudent(parsed);
+    } catch {
       localStorage.removeItem("user");
       navigate("/login");
     }
   }, [navigate]);
 
-  // Load theme
+  // Load Theme
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     const isDark = saved === "true";
@@ -64,12 +58,18 @@ const StudentDashboard = () => {
     document.documentElement.classList.toggle("dark", isDark);
   }, []);
 
+  const handleThemeToggle = () => {
+    const mode = !darkMode;
+    setDarkMode(mode);
+    localStorage.setItem("darkMode", mode ? "true" : "false");
+    document.documentElement.classList.toggle("dark", mode);
+  };
+
   // Sidebar persistence
   useEffect(() => {
     const saved = localStorage.getItem("sidebarOpen");
     if (saved === "true") setSidebarOpen(true);
   }, []);
-
   useEffect(() => {
     localStorage.setItem("sidebarOpen", sidebarOpen ? "true" : "false");
   }, [sidebarOpen]);
@@ -81,15 +81,14 @@ const StudentDashboard = () => {
         const res = await fetch("http://localhost:5000/api/events/all");
         const data = await res.json();
         setEvents(Array.isArray(data) ? data : data.events || []);
-      } catch (err) {
-        console.error("Error fetching events:", err);
+      } catch {
         setEvents([]);
       }
     };
     fetchEvents();
   }, []);
 
-  // Fetch student registrations
+  // Fetch registrations
   useEffect(() => {
     if (!student?.email) return;
     const fetchRegs = async () => {
@@ -99,23 +98,25 @@ const StudentDashboard = () => {
         );
         const data = await res.json();
         const regs = data.registrations || data || [];
-        regs.sort((a, b) => {
-          const da = new Date(a.createdAt || a.registeredAt || 0).getTime();
-          const db = new Date(b.createdAt || b.registeredAt || 0).getTime();
-          return db - da;
-        });
+        regs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         setRegistrations(regs);
-      } catch (err) {
-        console.error("Error fetching registrations:", err);
+      } catch {
         setRegistrations([]);
       }
     };
     fetchRegs();
   }, [student?.email]);
 
-  // Notification logic
-  const getApprovedIds = (regs = registrations) =>
-    regs
+  // Check registered
+  const isRegistered = (eventId) =>
+    registrations.some((r) => {
+      const rid = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
+      return String(rid) === String(eventId);
+    });
+
+  // Notifications Logic
+  const getApprovedIds = () =>
+    registrations
       .filter((r) => r.status === "Approved" && (r._id || r.eventId?._id))
       .map((r) => r._id || r.eventId?._id);
 
@@ -132,10 +133,9 @@ const StudentDashboard = () => {
   const handleBellClick = () => {
     const approved = getApprovedIds();
     const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
-    const newSeen = Array.from(new Set([...seen, ...approved]));
-    localStorage.setItem(seenKey(student.email), JSON.stringify(newSeen));
+    localStorage.setItem(seenKey(student.email), JSON.stringify([...new Set([...seen, ...approved])]));
     setUnseenApprovedIds([]);
-    setShowNotifDropdown((prev) => !prev);
+    setShowNotifDropdown((p) => !p);
   };
 
   // Greeting
@@ -146,119 +146,33 @@ const StudentDashboard = () => {
     return "Good Evening 🌙";
   };
 
-  // Check registration
-  const isRegistered = (eventId) =>
-    registrations.some((r) => {
-      const rid = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
-      return String(rid) === String(eventId);
-    });
-
-  // Registration handler
-  const handleRegister = (event) => {
-    if (isRegistered(event._id)) {
-      alert("Already registered!");
-      return;
-    }
-    navigate("/event-registration", { state: { event } });
-  };
-
-  // Notification redirect
-  const goToRegistration = (regId) => {
-    setShowNotifDropdown(false);
-    navigate(`/student/registrations#${regId}`);
-  };
-
-  // --- Pagination for Registrations ---
-  const regStart = (regPage - 1) * ITEMS_PER_PAGE;
-  const regPaginated = registrations.slice(regStart, regStart + ITEMS_PER_PAGE);
+  // Pagination
+  const regPaginated = registrations.slice((regPage - 1) * ITEMS_PER_PAGE, regPage * ITEMS_PER_PAGE);
   const regTotalPages = Math.max(1, Math.ceil(registrations.length / ITEMS_PER_PAGE));
 
-  // --- Option A: Only upcoming registered events ---
-  const registeredEventIds = new Set(
-    registrations
-      .map((r) => (typeof r.eventId === "object" ? r.eventId._id : r.eventId))
-      .filter(Boolean)
-  );
-
-  const upcomingRegisteredEvents = events
-    .filter(
-      (ev) =>
-        registeredEventIds.has(String(ev._id)) &&
-        ev.date &&
-        new Date(ev.date) > new Date()
-    )
+  const upcomingEvents = events
+    .filter((ev) => ev.date && new Date(ev.date) > new Date())
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const upStart = (upPage - 1) * ITEMS_PER_PAGE;
-  const upPaginated = upcomingRegisteredEvents.slice(
-    upStart,
-    upStart + ITEMS_PER_PAGE
-  );
-  const upTotalPages = Math.max(
-    1,
-    Math.ceil(upcomingRegisteredEvents.length / ITEMS_PER_PAGE)
-  );
+  const upPaginated = upcomingEvents.slice((upPage - 1) * ITEMS_PER_PAGE, upPage * ITEMS_PER_PAGE);
+  const upTotalPages = Math.max(1, Math.ceil(upcomingEvents.length / ITEMS_PER_PAGE));
 
-  if (!student)
-    return (
-      <div className="loading-screen">
-        <h2>Loading Student Dashboard...</h2>
-      </div>
-    );
+  if (!student) return <div className="loading-screen"><h2>Loading Student Dashboard...</h2></div>;
 
   return (
     <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-header">
-          <h2>🎓 EventHub</h2>
-        </div>
-
+        <div className="sidebar-header"><h2>🎓 EventHub</h2></div>
         <nav className="sidebar-menu">
-          <NavLink
-  to="/student-dashboard"
-  className={({ isActive }) => (isActive ? "active-link" : "")}
-  onClick={() => {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }}
->
-  <FaHome /> Dashboard
-</NavLink>
-
-
-          <NavLink
-            to="/student/events"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() =>  {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }}
-          >
-            <FaClipboardList /> Explore Events
-          </NavLink>
-
-          <NavLink
-            to="/student/registrations"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }}
-          >
-            <FaCalendarAlt /> My Registrations
-          </NavLink>
-
-          <NavLink
-            to="/student/profile"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-            onClick={() => {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }}
-          >
-            <FaUserCircle /> Profile
-          </NavLink>
+          <NavLink to="/student-dashboard"><FaHome /> Dashboard</NavLink>
+          <NavLink to="/student/events"><FaClipboardList /> Explore Events</NavLink>
+          <NavLink to="/student/registrations"><FaCalendarAlt /> My Registrations</NavLink>
+          <NavLink to="/student/profile"><FaUserCircle /> Profile</NavLink>
         </nav>
       </aside>
 
-      {/* Main Content */}
+      {/* Main */}
       <div className={`main-content ${sidebarOpen ? "shifted" : ""}`}>
         <nav className="navbar">
           <div className="nav-left">
@@ -269,293 +183,173 @@ const StudentDashboard = () => {
           <div className="nav-center">
             <div className="search-bar">
               <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search events..."
+              <input 
+                type="text" 
+                placeholder="Search events..." 
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => setSearchTerm(e.target.value)} 
               />
             </div>
           </div>
 
           <div className="nav-right" ref={profileRef}>
-            <div style={{ position: "relative" }}>
-              <button
-                className="bell-btn"
-                onClick={handleBellClick}
-                style={{ background: "transparent", border: "none", cursor: "pointer" }}
-              >
-                <FaBell />
-                {unseenApprovedIds.length > 0 && (
-                  <span className="badge">{unseenApprovedIds.length}</span>
-                )}
-              </button>
-
-              {showNotifDropdown && (
-                <div className="notif-dropdown">
-                  <div className="notif-header">Recent Approvals</div>
-
-                  {registrations.filter((r) => r.status === "Approved").length ===
-                  0 ? (
-                    <div className="notif-empty">No approvals yet</div>
-                  ) : (
-                    <ul className="notif-list">
-                      {registrations
-                        .filter((r) => r.status === "Approved")
-                        .map((r) => (
-                          <li key={r._id} onClick={() => goToRegistration(r._id)}>
-                            <div className="notif-thumb">
-                              <img
-                                src={
-                                  r.eventId?.image ||
-                                  "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"
-                                }
-                                alt=""
-                              />
-                            </div>
-                            <div>
-                              <strong>{r.eventId?.title}</strong>
-                              <span>
-                                {new Date(r.eventId?.date).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </li>
-                        ))}
-                    </ul>
-                  )}
-                </div>
-              )}
+            {/* SAME SWITCH AS SETTINGS */}
+            <div className="theme-switch nav-switch" onClick={handleThemeToggle}>
+              <div className={`switch ${darkMode ? "on" : ""}`}>
+                <div className="circle"></div>
+              </div>
             </div>
+
+            <button className="bell-btn" onClick={handleBellClick}>
+              <FaBell />
+              {unseenApprovedIds.length > 0 && <span className="badge">{unseenApprovedIds.length}</span>}
+            </button>
 
             <div className="profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <FaUserCircle className="profile-icon" />
-              <div className="profile-info">
-                {/* <p className="name">{student.name}</p> */}
-              </div>
             </div>
 
             {showProfileMenu && (
               <div className="profile-dropdown">
-                <p onClick={() => navigate("/student/profile")}>
-                  <FaUserCircle /> View Profile
-                </p>
-                <p
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    setShowSettings(true);
-                  }}
-                >
-                  <FaCog /> Settings
-                </p>
-                <p onClick={() => setShowLogoutModal(true)}>
-                  <FaSignOutAlt /> Logout
-                </p>
+                <p onClick={() => navigate("/student/profile")}><FaUserCircle /> View Profile</p>
+                <p onClick={() => { setShowProfileMenu(false); setShowSettings(true); }}><FaCog /> Settings</p>
+                <p onClick={() => setShowLogoutModal(true)}><FaSignOutAlt /> Logout</p>
+              </div>
+            )}
+
+            {showNotifDropdown && (
+              <div className="notifications-dropdown">
+                <h4>Notifications</h4>
+                <ul className="notif-list">
+                  {registrations
+                    .filter((r) => r.status === "Approved")
+                    .map((r) => {
+                      const ev = typeof r.eventId === "object" ? r.eventId : null;
+                      return (
+                        <li key={r._id} className="notif-item">
+                          <strong>{ev?.title}</strong>
+                          <span className="notif-approved">✔ Registration Approved</span>
+                          {ev?.date && <small>📅 {new Date(ev.date).toLocaleDateString()}</small>}
+                        </li>
+                      );
+                    })}
+                  {!registrations.some((r) => r.status === "Approved") && (
+                    <p className="no-notif">No new notifications</p>
+                  )}
+                </ul>
               </div>
             )}
           </div>
         </nav>
 
-        {/* Dashboard Header */}
+        {/* Hero */}
         <div className="dashboard-header hero">
           <div className="hero-content">
             <div className="welcome-text">
-              <h2>
-                {getGreeting()}, <span>{student.name}</span> 👋
-              </h2>
+              <h2>{getGreeting()}, <span>{student.name}</span> 👋</h2>
               <p>Welcome back — here’s a quick summary of your events.</p>
             </div>
-
             <div className="stats-grid center-stats">
-              <div className="stat-card">
-                <h2>{registrations.length}</h2>
-                <p>Events Registered</p>
-              </div>
-              <div className="stat-card">
-                <h2>{upcomingRegisteredEvents.length}</h2>
-                <p>Upcoming Events</p>
-              </div>
+              <div className="stat-card"><h2>{registrations.length}</h2><p>Events Registered</p></div>
+              <div className="stat-card"><h2>{upcomingEvents.length}</h2><p>Upcoming Events</p></div>
             </div>
           </div>
         </div>
 
-        {/* My Registrations */}
+        {/* Registrations */}
         <section className="registrations-section">
           <div className="section-header">
             <h2>My Registrations</h2>
-            <button
-              className="view-all"
-              onClick={() => navigate("/student/registrations")}
-            >
-              View All
-            </button>
+            <button className="view-all" onClick={() => navigate("/student/registrations")}>View All</button>
           </div>
 
           <div className="registrations-grid">
             {registrations.length ? (
               regPaginated.map((r) => (
                 <div key={r._id} className="event-card">
-                  <img
-                    src={
-                      r.eventId?.image ||
-                      "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"
-                    }
-                    alt=""
-                  />
+                  <img src={r.eventId?.image || "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"} alt="" />
                   <div className="event-info">
                     <h3>{r.eventId?.title}</h3>
                     <p>📅 {new Date(r.eventId?.date).toLocaleDateString()}</p>
                     <p>🕒 {r.eventId?.time || "TBD"}</p>
-                    <p>
-                      {r.status === "Approved" ? (
-                        <span className="approved">
-                          <FaCheckCircle /> Approved
-                        </span>
-                      ) : (
-                        <span className="pending">
-                          <FaClock /> Pending
-                        </span>
-                      )}
-                    </p>
+                    {r.status === "Approved" ? (
+                      <span className="approved"><FaCheckCircle /> Approved</span>
+                    ) : (
+                      <span className="pending"><FaClock /> Pending</span>
+                    )}
                   </div>
                 </div>
               ))
-            ) : (
-              <p>No registrations yet.</p>
-            )}
+            ) : <p>No registrations yet.</p>}
           </div>
-
-          {registrations.length > ITEMS_PER_PAGE && (
-            <div className="pagination">
-              <button
-                disabled={regPage === 1}
-                onClick={() => setRegPage((p) => p - 1)}
-              >
-                Prev
-              </button>
-              <span>
-                {regPage} / {regTotalPages}
-              </span>
-              <button
-                disabled={regPage === regTotalPages}
-                onClick={() => setRegPage((p) => p + 1)}
-              >
-                Next
-              </button>
-            </div>
-          )}
         </section>
 
-        {/* Upcoming Registered Events */}
+        {/* Upcoming */}
         <section className="upcoming-section">
           <div className="section-header">
             <h2>Upcoming Events</h2>
-            <button className="view-all" onClick={() => navigate("/student/events")}>
-              Explore All Events
-            </button>
+            <button className="view-all" onClick={() => navigate("/student/events")}>Explore All Events</button>
           </div>
 
           <div className="upcoming-grid">
-            {upcomingRegisteredEvents.length ? (
+            {upcomingEvents.length ? (
               upPaginated.map((event) => (
                 <div key={event._id} className="upcoming-card">
-                  <img
-                    src={
-                      event.image ||
-                      "https://img.freepik.com/free-vector/hackathon-illustration_23-2148883451.jpg"
-                    }
-                    alt=""
-                  />
+                  <img src={event.image || "https://img.freepik.com/free-vector/hackathon-illustration_23-2148883451.jpg"} alt="" />
                   <div className="event-info">
                     <h3>{event.title}</h3>
                     <p>📅 {new Date(event.date).toLocaleDateString()}</p>
                     <p>🕒 {event.time || "TBD"}</p>
 
-                    <button
-                      className="btn"
-                      disabled
-                      style={{ background: "#9ca3af", cursor: "not-allowed" }}
-                    >
-                      Registered
-                    </button>
+                    {isRegistered(event._id) ? (
+                      <button className="btn" disabled style={{ background: "#9CA3AF" }}>Registered</button>
+                    ) : (
+                      <button className="btn" onClick={() => navigate("/event-registration", { state: { event } })}>Register Now</button>
+                    )}
                   </div>
                 </div>
               ))
-            ) : (
-              <p>No upcoming registered events.</p>
-            )}
+            ) : <p>No upcoming events.</p>}
           </div>
-
-          {upcomingRegisteredEvents.length > ITEMS_PER_PAGE && (
-            <div className="pagination">
-              <button disabled={upPage === 1} onClick={() => setUpPage((p) => p - 1)}>
-                Prev
-              </button>
-              <span>
-                {upPage} / {upTotalPages}
-              </span>
-              <button
-                disabled={upPage === upTotalPages}
-                onClick={() => setUpPage((p) => p + 1)}
-              >
-                Next
-              </button>
-            </div>
-          )}
         </section>
       </div>
 
-      {/* Settings Modal */}
+      {/* ⚙ Settings Modal */}
       {showSettings && (
         <div className="modal-overlay" onClick={() => setShowSettings(false)}>
-          <div
-            className="edit-profile-modal settings-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="edit-profile-modal settings-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Settings</h3>
+
             <div className="flex-space">
               <div>
                 <strong>Theme</strong>
                 <div className="desc">Toggle dark/light mode</div>
               </div>
-              <button className="theme-toggle-btn" onClick={handleThemeToggle}>
-                {darkMode ? (
-                  <>
-                    <FaSun /> Light
-                  </>
-                ) : (
-                  <>
-                    <FaMoon /> Dark
-                  </>
-                )}
-              </button>
+
+              {/* SAME SWITCH */}
+              <div className="theme-switch" onClick={handleThemeToggle}>
+                <div className={`switch ${darkMode ? "on" : ""}`}>
+                  <div className="circle"></div>
+                </div>
+                <span>{darkMode ? "Dark Mode" : "Light Mode"}</span>
+              </div>
             </div>
+
             <div className="modal-buttons">
-              <button className="cancel-btn" onClick={() => setShowSettings(false)}>
-                Close
-              </button>
+              <button className="cancel-btn" onClick={() => setShowSettings(false)}>Close</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Logout Modal */}
+      {/* 🔐 Logout */}
       {showLogoutModal && (
         <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
           <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Are you sure you want to logout?</h3>
             <div className="modal-buttons">
-              <button
-                className="save-btn"
-                onClick={() => {
-                  localStorage.removeItem("user");
-                  navigate("/login");
-                }}
-              >
-                Yes
-              </button>
-              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>
-                No
-              </button>
+              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
+              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
             </div>
           </div>
         </div>

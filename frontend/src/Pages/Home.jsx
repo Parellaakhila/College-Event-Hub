@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "../Styles/Home.css";
 import { useNavigate } from "react-router-dom";
-import { FaBars, FaTimes, FaMoon, FaSun } from "react-icons/fa";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -54,62 +54,33 @@ const Home = () => {
 
         {/* CENTER LINKS (Desktop only) */}
         <div className="nav-center">
-          <a
-            className={activeLink === "home" ? "active" : ""}
-            onClick={() => handleNavClick("home")}
-          >
-            Home
-          </a>
-          <a
-            className={activeLink === "events" ? "active" : ""}
-            onClick={() => handleNavClick("events")}
-          >
-            Events
-          </a>
-          <a
-            className={activeLink === "about" ? "active" : ""}
-            onClick={() => handleNavClick("about")}
-          >
-            About
-          </a>
-          <a
-            className={activeLink === "contact" ? "active" : ""}
-            onClick={() => handleNavClick("contact")}
-          >
-            Contact
-          </a>
+          <a className={activeLink === "home" ? "active" : ""} onClick={() => handleNavClick("home")}>Home</a>
+          <a className={activeLink === "events" ? "active" : ""} onClick={() => handleNavClick("events")}>Events</a>
+          <a className={activeLink === "about" ? "active" : ""} onClick={() => handleNavClick("about")}>About</a>
+          <a className={activeLink === "contact" ? "active" : ""} onClick={() => handleNavClick("contact")}>Contact</a>
         </div>
 
-        {/* RIGHT SIDE (Theme + Auth + Hamburger) */}
+        {/* RIGHT SIDE */}
         <div className="nav-right">
-          {/* Theme stays here ALWAYS */}
-          <button className="theme-toggle-btn desktop-toggle" onClick={toggleTheme}>
-            {isDarkMode ? <FaSun /> : <FaMoon />}
-          </button>
+          {/* ⭐ Modern Switch instead of icon */}
+          <label className="home-theme-switch">
+            <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
+            <span className="home-slider"></span>
+          </label>
 
           {!isLoggedIn ? (
             <div className="nav-actions">
-              <button onClick={() => navigate("/login")} className="btn-outline">
-                Login
-              </button>
-              <button onClick={() => navigate("/signup")} className="btn-primary">
-                Sign Up
-              </button>
+              <button onClick={() => navigate("/login")} className="btn-outline">Login</button>
+              <button onClick={() => navigate("/signup")} className="btn-primary">Sign Up</button>
             </div>
           ) : (
-            <button
-              className="btn-primary dashboard-btn"
-              onClick={() => navigate("/student-dashboard")}
-            >
+            <button className="btn-primary dashboard-btn" onClick={() => navigate("/student-dashboard")}>
               Dashboard
             </button>
           )}
 
           {/* Hamburger */}
-          <div
-            className={`nav-toggle ${menuOpen ? "open" : ""}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
+          <div className={`nav-toggle ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <FaTimes /> : <FaBars />}
           </div>
         </div>
@@ -124,73 +95,34 @@ const Home = () => {
           <div className="nav-actions-mobile">
             {!isLoggedIn ? (
               <>
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/login");
-                  }}
-                  className="btn-outline"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/signup");
-                  }}
-                  className="btn-primary"
-                >
-                  Sign Up
-                </button>
+                <button onClick={() => { setMenuOpen(false); navigate("/login"); }} className="btn-outline">Login</button>
+                <button onClick={() => { setMenuOpen(false); navigate("/signup"); }} className="btn-primary">Sign Up</button>
               </>
             ) : (
               <>
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/student-dashboard");
-                  }}
-                >
-                  Dashboard
-                </button>
-                <button className="btn-outline logout-btn" onClick={handleLogout}>
-                  Logout
-                </button>
+                <button className="btn-primary" onClick={() => { setMenuOpen(false); navigate("/student-dashboard"); }}>Dashboard</button>
+                <button className="btn-outline logout-btn" onClick={handleLogout}>Logout</button>
               </>
             )}
           </div>
         </div>
       </nav>
 
-      {/* === REST OF YOUR PAGE BELOW REMAINS SAME === */}
+      {/* 🔥 REST OF PAGE SAME */}
       {/* HERO */}
       <section className="hero-section">
         <div className="hero-left">
-          <h1>
-            Connect, Compete & <span>Celebrate</span>
-          </h1>
-          <p>
-            Discover and participate in exciting college events. Connect with
-            peers, explore opportunities, and create memorable experiences.
-          </p>
-
+          <h1>Connect, Compete & <span>Celebrate</span></h1>
+          <p>Discover and participate in exciting college events. Connect with peers, explore opportunities, and create memorable experiences.</p>
           <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => navigate("/signup")}>
-              Join as Student
-            </button>
-            <button className="btn-outline" onClick={() => navigate("/signup")}>
-              Register College
-            </button>
+            <button className="btn-primary" onClick={() => navigate("/signup")}>Join as Student</button>
+            <button className="btn-outline" onClick={() => navigate("/signup")}>Register College</button>
           </div>
         </div>
 
         <div className="hero-right">
           <div className="hero-image-wrapper">
-            <img
-              src="https://img.freepik.com/free-vector/flat-university-concept-background_52683-11176.jpg?semt=ais_hybrid&w=740&q=80"
-              alt="Events Illustration"
-            />
+            <img src="https://img.freepik.com/free-vector/flat-university-concept-background_52683-11176.jpg?semt=ais_hybrid&w=740&q=80" alt="Events Illustration" />
             <div className="hero-glow" />
           </div>
         </div>
@@ -199,7 +131,6 @@ const Home = () => {
       {/* FEATURES */}
       <section className="features">
         <h2>Why CampusEventHub?</h2>
-
         <div className="features-grid">
           <div className="feature-card">
             <img src="https://img.freepik.com/free-vector/happy-tiny-business-people-dancing-having-fun-drinking-wine-corporate-party-team-building-activity-corporate-event-idea-concept-pinkish-coral-bluevector-isolated-illustration_335657-1414.jpg?semt=ais_incoming&w=740&q=80" />
