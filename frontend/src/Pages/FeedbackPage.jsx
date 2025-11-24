@@ -10,6 +10,7 @@ const FeedbackPage = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
 
+  // Get logged user
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("user"));
@@ -29,6 +30,10 @@ const FeedbackPage = () => {
     _id: null,
   });
 
+  // 🔒 Lock state
+  const [isLocked, setIsLocked] = useState(false);
+
+  // ===================== FETCH EVENT =====================
   useEffect(() => {
     if (!user) {
       setLoading(false);
@@ -67,7 +72,7 @@ const FeedbackPage = () => {
     return () => controller.abort();
   }, [eventId, navigate, user]);
 
-  // 🔵 CHECK EXISTING FEEDBACK
+  // ===================== CHECK EXISTING FEEDBACK =====================
   useEffect(() => {
     const checkFeedback = async () => {
       if (!user?.email || !eventId) return;
@@ -86,7 +91,8 @@ const FeedbackPage = () => {
             _id: data.feedback._id,
           });
 
-          localStorage.setItem(`fb_${eventId}_${user.email}`, "true");
+          // 🔒 If already edited once, disable editing
+          if (data.feedback.editCount >= 1) setIsLocked(true);
         }
       } catch (err) {
         console.error("Check feedback error:", err);
@@ -96,16 +102,21 @@ const FeedbackPage = () => {
     checkFeedback();
   }, [user?.email, eventId]);
 
+  // ===================== INPUT HANDLERS =====================
   const handleChange = (e) => {
+    if (isLocked) return; // ⛔ Stop editing if locked
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
   const handleStarClick = (value) => {
+    if (isLocked) return;
     setFormData((p) => ({ ...p, rating: value }));
   };
 
+  // ===================== SUBMIT =====================
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLocked) return; // ⛔ Block submit when locked
 
     if (!formData.rating || formData.comments.trim().length === 0) {
       toast.error("Please provide a rating and comments", { position: "top-center" });
@@ -130,19 +141,18 @@ const FeedbackPage = () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        localStorage.setItem(`fb_${eventId}_${formData.email}`, "true");
-
         toast.success(
           formData._id ? "✏️ Feedback Updated!" : "🎉 Feedback Submitted!",
           { position: "top-center", autoClose: 1500 }
         );
         setTimeout(() => navigate("/student/registrations"), 1400);
       } else throw new Error(data.message);
-
     } catch (err) {
       toast.error(err.message || "Network error – try again later", { position: "top-center" });
     }
   };
+
+  // ===================== UI RENDER =====================
 
   if (loading) {
     return (
@@ -171,6 +181,8 @@ const FeedbackPage = () => {
     <div className="feedback-wrapper">
       <ToastContainer />
       <div className="feedback-card-container">
+
+        {/* EVENT PREVIEW */}
         <div className="feedback-left">
           <img
             src={event.image || "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"}
@@ -185,8 +197,11 @@ const FeedbackPage = () => {
           </div>
         </div>
 
+        {/* FORM */}
         <form className="feedback-right" onSubmit={handleSubmit}>
-          <h3>{formData._id ? "Edit Feedback" : "Submit Feedback"}</h3>
+          <h3>
+            {isLocked ? "Feedback Locked" : formData._id ? "Edit Feedback" : "Submit Feedback"}
+          </h3>
 
           <label>Name</label>
           <input type="text" name="name" value={formData.name} readOnly />
@@ -200,7 +215,7 @@ const FeedbackPage = () => {
               <FaStar
                 key={s}
                 onClick={() => handleStarClick(s)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: isLocked ? "not-allowed" : "pointer" }}
                 color={s <= formData.rating ? "#f59e0b" : "#e5e7eb"}
                 size={22}
               />
@@ -212,13 +227,14 @@ const FeedbackPage = () => {
             name="comments"
             value={formData.comments}
             onChange={handleChange}
-            placeholder="Share your thoughts about this event..."
+            readOnly={isLocked}
+            placeholder={isLocked ? "You cannot edit feedback anymore." : "Share your thoughts about this event..."}
             rows={5}
             required
           />
 
-          <button className="submit-btn" type="submit">
-            {formData._id ? "Update Feedback" : "Submit Feedback"}
+          <button className="submit-btn" type="submit" disabled={isLocked}>
+            {isLocked ? "Feedback Locked" : formData._id ? "Edit Feedback" : "Submit Feedback"}
           </button>
 
           <button className="back-btn" type="button" onClick={() => navigate("/student/registrations")}>

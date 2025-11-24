@@ -916,3 +916,10 @@ body, .dashboard-header, .stat-card, .event-card, .upcoming-card, .profile-dropd
   padding: 10px 0;
   border-radius: 8px;
 }
+/* 👇 ADD THIS */
+#root {
+  height: 100vh;
+  overflow: hidden; /* ❗ important */
+  display: flex;
+  flex-direction: column;
+}

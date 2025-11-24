@@ -7,6 +7,7 @@ const feedbackSchema = new mongoose.Schema(
   email: { type: String, required: true, lowercase: true },
     rating: { type: Number, required: true },
     comments: { type: String, required: true }, 
+    editCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

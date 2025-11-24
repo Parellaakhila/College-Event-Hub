@@ -97,9 +97,15 @@ useEffect(() => {
       const data = await res.json();
 
       setRegistrations((data.registrations || data || []).map((r) => {
-        const key = `fb_${r.eventId?._id}_${student.email}`;
-        return { ...r, feedbackGiven: localStorage.getItem(key) === "true" };
-      }));
+  const givenKey = `fb_${r.eventId?._id}_${student.email}`;
+  const lockKey = `fb_lock_${r.eventId?._id}_${student.email}`;
+  return {
+    ...r,
+    feedbackGiven: localStorage.getItem(givenKey) === "true",
+    feedbackLocked: localStorage.getItem(lockKey) === "true"
+  };
+}));
+
     } catch (err) {
       console.error("Error fetching registrations:", err);
       setRegistrations([]);
@@ -260,13 +266,28 @@ useEffect(() => {
                 <FaTrash /> Delete
               </button>
             )}
-            {colorClass === "past" && (
-  <button className="feedback-inline-btn" 
-    onClick={() => handleFeedback(reg.eventId?._id)}
-    title={reg.feedbackGiven ? "Edit feedback" : "Leave feedback"}>
-    <FaCommentDots /> {reg.feedbackGiven ? "Edit Feedback" : "Feedback"}
+          {colorClass === "past" && (
+  <button
+    className={`feedback-inline-btn ${reg.feedbackLocked ? "disabled-btn" : ""}`}
+    onClick={() => !reg.feedbackLocked && handleFeedback(reg.eventId?._id)}
+    title={
+      reg.feedbackLocked
+        ? "Feedback Locked"
+        : reg.feedbackGiven
+        ? "Edit feedback"
+        : "Leave feedback"
+    }
+    disabled={reg.feedbackLocked}
+  >
+    <FaCommentDots />{" "}
+    {reg.feedbackLocked
+      ? "Locked"
+      : reg.feedbackGiven
+      ? "Edit Feedback"
+      : "Feedback"}
   </button>
 )}
+
 
           </div>
         </div>

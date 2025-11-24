@@ -12,6 +12,8 @@ import {
   FaCog,
   FaClock,
   FaCheckCircle,
+  FaMoon,
+  FaSun,
   FaClipboardList,
 } from "react-icons/fa";
 import { useNavigate, NavLink } from "react-router-dom";
@@ -26,9 +28,12 @@ const StudentDashboard = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // 🔔 Notifications
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [unseenApprovedIds, setUnseenApprovedIds] = useState([]);
 
+  // 🔢 Pagination
   const [regPage, setRegPage] = useState(1);
   const [upPage, setUpPage] = useState(1);
   const ITEMS_PER_PAGE = 3;
@@ -36,36 +41,33 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
-  // Load user
+  // ========================== LOAD STUDENT ==========================
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem("user");
-      if (!storedUser) return navigate("/login");
-      const parsed = JSON.parse(storedUser);
-      if (!parsed?.email) return navigate("/login");
-      setStudent(parsed);
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.email) return navigate("/login");
+      setStudent(user);
     } catch {
       localStorage.removeItem("user");
       navigate("/login");
     }
   }, [navigate]);
 
-  // Load Theme
+  // ========================== THEME ==========================
   useEffect(() => {
-    const saved = localStorage.getItem("darkMode");
-    const isDark = saved === "true";
+    const isDark = localStorage.getItem("darkMode") === "true";
     setDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
   }, []);
 
   const handleThemeToggle = () => {
-    const mode = !darkMode;
-    setDarkMode(mode);
-    localStorage.setItem("darkMode", mode ? "true" : "false");
-    document.documentElement.classList.toggle("dark", mode);
+    const next = !darkMode;
+    setDarkMode(next);
+    localStorage.setItem("darkMode", next ? "true" : "false");
+    document.documentElement.classList.toggle("dark", next);
   };
 
-  // Sidebar persistence
+  // ========================== SIDEBAR MEMORY ==========================
   useEffect(() => {
     const saved = localStorage.getItem("sidebarOpen");
     if (saved === "true") setSidebarOpen(true);
@@ -74,9 +76,9 @@ const StudentDashboard = () => {
     localStorage.setItem("sidebarOpen", sidebarOpen ? "true" : "false");
   }, [sidebarOpen]);
 
-  // Fetch events
+  // ========================== FETCH EVENTS ==========================
   useEffect(() => {
-    const fetchEvents = async () => {
+    const load = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/events/all");
         const data = await res.json();
@@ -85,40 +87,32 @@ const StudentDashboard = () => {
         setEvents([]);
       }
     };
-    fetchEvents();
+    load();
   }, []);
 
-  // Fetch registrations
+  // ========================== FETCH REGISTRATIONS ==========================
   useEffect(() => {
     if (!student?.email) return;
-    const fetchRegs = async () => {
+    const load = async () => {
       try {
         const res = await fetch(
           `http://localhost:5000/api/registrations/student/${student.email}`
         );
         const data = await res.json();
-        const regs = data.registrations || data || [];
-        regs.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-        setRegistrations(regs);
+        const sorted = (data.registrations || data || []).sort(
+          (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+        setRegistrations(sorted);
       } catch {
         setRegistrations([]);
       }
     };
-    fetchRegs();
+    load();
   }, [student?.email]);
 
-  // Check registered
-  const isRegistered = (eventId) =>
-    registrations.some((r) => {
-      const rid = typeof r.eventId === "object" ? r.eventId._id : r.eventId;
-      return String(rid) === String(eventId);
-    });
-
-  // Notifications Logic
+  // ========================== NOTIFICATIONS ==========================
   const getApprovedIds = () =>
-    registrations
-      .filter((r) => r.status === "Approved" && (r._id || r.eventId?._id))
-      .map((r) => r._id || r.eventId?._id);
+    registrations.filter((r) => r.status === "Approved").map((r) => r._id);
 
   const seenKey = (email) => `seenApproved_${email}`;
 
@@ -126,8 +120,7 @@ const StudentDashboard = () => {
     if (!student?.email) return;
     const approved = getApprovedIds();
     const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
-    const unseen = approved.filter((id) => !seen.includes(id));
-    setUnseenApprovedIds(unseen);
+    setUnseenApprovedIds(approved.filter((id) => !seen.includes(id)));
   }, [registrations, student?.email]);
 
   const handleBellClick = () => {
@@ -135,33 +128,50 @@ const StudentDashboard = () => {
     const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
     localStorage.setItem(seenKey(student.email), JSON.stringify([...new Set([...seen, ...approved])]));
     setUnseenApprovedIds([]);
-    setShowNotifDropdown((p) => !p);
+    setShowNotifDropdown((x) => !x);
   };
 
-  // Greeting
+  // ========================== UTILITIES ==========================
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning ☀️";
-    if (hour < 18) return "Good Afternoon 🌤️";
+    const hr = new Date().getHours();
+    if (hr < 12) return "Good Morning ☀️";
+    if (hr < 18) return "Good Afternoon 🌤️";
     return "Good Evening 🌙";
   };
 
-  // Pagination
-  const regPaginated = registrations.slice((regPage - 1) * ITEMS_PER_PAGE, regPage * ITEMS_PER_PAGE);
-  const regTotalPages = Math.max(1, Math.ceil(registrations.length / ITEMS_PER_PAGE));
+  const isRegistered = (id) =>
+    registrations.some((r) => String(r.eventId?._id || r.eventId) === String(id));
 
-  const upcomingEvents = events
-    .filter((ev) => ev.date && new Date(ev.date) > new Date())
+  // ========================== PAGINATION ==========================
+  const regPaginated = registrations.slice(
+    (regPage - 1) * ITEMS_PER_PAGE,
+    regPage * ITEMS_PER_PAGE
+  );
+  const regTotalPages = Math.ceil(registrations.length / ITEMS_PER_PAGE);
+
+  const registeredEventIds = new Set(
+    registrations.map((r) => (typeof r.eventId === "object" ? r.eventId._id : r.eventId))
+  );
+
+  const upcomingRegisteredEvents = events
+    .filter(
+      (e) => registeredEventIds.has(String(e._id)) && e.date && new Date(e.date) > new Date()
+    )
     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const upPaginated = upcomingEvents.slice((upPage - 1) * ITEMS_PER_PAGE, upPage * ITEMS_PER_PAGE);
-  const upTotalPages = Math.max(1, Math.ceil(upcomingEvents.length / ITEMS_PER_PAGE));
+  const upPaginated = upcomingRegisteredEvents.slice(
+    (upPage - 1) * ITEMS_PER_PAGE,
+    upPage * ITEMS_PER_PAGE
+  );
+  const upTotalPages = Math.ceil(upcomingRegisteredEvents.length / ITEMS_PER_PAGE);
 
-  if (!student) return <div className="loading-screen"><h2>Loading Student Dashboard...</h2></div>;
+  // ========================== RENDER ==========================
+  if (!student) return <div className="loading-screen"><h2>Loading...</h2></div>;
 
   return (
     <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
-      {/* Sidebar */}
+
+      {/* ========================== SIDEBAR ========================== */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header"><h2>🎓 EventHub</h2></div>
         <nav className="sidebar-menu">
@@ -172,9 +182,11 @@ const StudentDashboard = () => {
         </nav>
       </aside>
 
-      {/* Main */}
+      {/* ========================== MAIN CONTENT ========================== */}
       <div className={`main-content ${sidebarOpen ? "shifted" : ""}`}>
-        <nav className="navbar">
+
+        {/* 🔥 STICKY NAVBAR */}
+        <nav className="navbar sticky-nav">
           <div className="nav-left">
             <FaBars className="menu-icon" onClick={() => setSidebarOpen(!sidebarOpen)} />
             <h1 className="logo">Student Dashboard</h1>
@@ -183,26 +195,18 @@ const StudentDashboard = () => {
           <div className="nav-center">
             <div className="search-bar">
               <FaSearch className="search-icon" />
-              <input 
-                type="text" 
-                placeholder="Search events..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)} 
-              />
+              <input type="text" placeholder="Search events..."
+                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
           </div>
 
-          <div className="nav-right" ref={profileRef}>
-            {/* SAME SWITCH AS SETTINGS */}
+          <div className="nav-right">
             <div className="theme-switch nav-switch" onClick={handleThemeToggle}>
-              <div className={`switch ${darkMode ? "on" : ""}`}>
-                <div className="circle"></div>
-              </div>
+              {darkMode ? <FaSun /> : <FaMoon />}
             </div>
 
             <button className="bell-btn" onClick={handleBellClick}>
-              <FaBell />
-              {unseenApprovedIds.length > 0 && <span className="badge">{unseenApprovedIds.length}</span>}
+              <FaBell />{unseenApprovedIds.length > 0 && <span className="badge">{unseenApprovedIds.length}</span>}
             </button>
 
             <div className="profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
@@ -212,37 +216,14 @@ const StudentDashboard = () => {
             {showProfileMenu && (
               <div className="profile-dropdown">
                 <p onClick={() => navigate("/student/profile")}><FaUserCircle /> View Profile</p>
-                <p onClick={() => { setShowProfileMenu(false); setShowSettings(true); }}><FaCog /> Settings</p>
+                <p onClick={() => setShowSettings(true)}><FaCog /> Settings</p>
                 <p onClick={() => setShowLogoutModal(true)}><FaSignOutAlt /> Logout</p>
-              </div>
-            )}
-
-            {showNotifDropdown && (
-              <div className="notifications-dropdown">
-                <h4>Notifications</h4>
-                <ul className="notif-list">
-                  {registrations
-                    .filter((r) => r.status === "Approved")
-                    .map((r) => {
-                      const ev = typeof r.eventId === "object" ? r.eventId : null;
-                      return (
-                        <li key={r._id} className="notif-item">
-                          <strong>{ev?.title}</strong>
-                          <span className="notif-approved">✔ Registration Approved</span>
-                          {ev?.date && <small>📅 {new Date(ev.date).toLocaleDateString()}</small>}
-                        </li>
-                      );
-                    })}
-                  {!registrations.some((r) => r.status === "Approved") && (
-                    <p className="no-notif">No new notifications</p>
-                  )}
-                </ul>
               </div>
             )}
           </div>
         </nav>
 
-        {/* Hero */}
+        {/* HERO */}
         <div className="dashboard-header hero">
           <div className="hero-content">
             <div className="welcome-text">
@@ -250,13 +231,13 @@ const StudentDashboard = () => {
               <p>Welcome back — here’s a quick summary of your events.</p>
             </div>
             <div className="stats-grid center-stats">
-              <div className="stat-card"><h2>{registrations.length}</h2><p>Events Registered</p></div>
-              <div className="stat-card"><h2>{upcomingEvents.length}</h2><p>Upcoming Events</p></div>
+              <div className="stat-card"><h2>{registrations.length}</h2><p>Registered</p></div>
+              <div className="stat-card"><h2>{upcomingRegisteredEvents.length}</h2><p>Upcoming</p></div>
             </div>
           </div>
         </div>
 
-        {/* Registrations */}
+        {/* MY REGISTRATIONS */}
         <section className="registrations-section">
           <div className="section-header">
             <h2>My Registrations</h2>
@@ -272,88 +253,60 @@ const StudentDashboard = () => {
                     <h3>{r.eventId?.title}</h3>
                     <p>📅 {new Date(r.eventId?.date).toLocaleDateString()}</p>
                     <p>🕒 {r.eventId?.time || "TBD"}</p>
-                    {r.status === "Approved" ? (
-                      <span className="approved"><FaCheckCircle /> Approved</span>
-                    ) : (
-                      <span className="pending"><FaClock /> Pending</span>
-                    )}
+                    {r.status === "Approved"
+                      ? <span className="approved"><FaCheckCircle /> Approved</span>
+                      : <span className="pending"><FaClock /> Pending</span>}
                   </div>
                 </div>
-              ))
-            ) : <p>No registrations yet.</p>}
+              ))) : <p>No registrations yet.</p>}
           </div>
+
+          {/* 🔥 PAGINATION */}
+          {regTotalPages > 1 && (
+            <div className="pagination">
+              <button disabled={regPage === 1} onClick={() => setRegPage((p) => p - 1)}>Prev</button>
+              <span>{regPage} / {regTotalPages}</span>
+              <button disabled={regPage === regTotalPages} onClick={() => setRegPage((p) => p + 1)}>Next</button>
+            </div>
+          )}
         </section>
 
-        {/* Upcoming */}
+        {/* UPCOMING */}
         <section className="upcoming-section">
           <div className="section-header">
             <h2>Upcoming Events</h2>
-            <button className="view-all" onClick={() => navigate("/student/events")}>Explore All Events</button>
+            <button className="view-all" onClick={() => navigate("/student/events")}>
+              Explore All Events
+            </button>
           </div>
 
           <div className="upcoming-grid">
-            {upcomingEvents.length ? (
-              upPaginated.map((event) => (
-                <div key={event._id} className="upcoming-card">
-                  <img src={event.image || "https://img.freepik.com/free-vector/hackathon-illustration_23-2148883451.jpg"} alt="" />
+            {upcomingRegisteredEvents.length ? (
+              upPaginated.map((e) => (
+                <div key={e._id} className="upcoming-card">
+                  <img src={e.image || "https://img.freepik.com/free-vector/hackathon-illustration_23-2148883451.jpg"} alt="" />
                   <div className="event-info">
-                    <h3>{event.title}</h3>
-                    <p>📅 {new Date(event.date).toLocaleDateString()}</p>
-                    <p>🕒 {event.time || "TBD"}</p>
-
-                    {isRegistered(event._id) ? (
-                      <button className="btn" disabled style={{ background: "#9CA3AF" }}>Registered</button>
-                    ) : (
-                      <button className="btn" onClick={() => navigate("/event-registration", { state: { event } })}>Register Now</button>
-                    )}
+                    <h3>{e.title}</h3>
+                    <p>📅 {new Date(e.date).toLocaleDateString()}</p>
+                    <p>🕒 {e.time || "TBD"}</p>
+                    <button className="btn" disabled style={{ background: "#9CA3AF" }}>Registered</button>
                   </div>
                 </div>
               ))
-            ) : <p>No upcoming events.</p>}
+            ) : <p>No upcoming registered events.</p>}
           </div>
+
+          {/* 🔥 PAGINATION */}
+          {upTotalPages > 1 && (
+            <div className="pagination">
+              <button disabled={upPage === 1} onClick={() => setUpPage((p) => p - 1)}>Prev</button>
+              <span>{upPage} / {upTotalPages}</span>
+              <button disabled={upPage === upTotalPages} onClick={() => setUpPage((p) => p + 1)}>Next</button>
+            </div>
+          )}
         </section>
+
       </div>
-
-      {/* ⚙ Settings Modal */}
-      {showSettings && (
-        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
-          <div className="edit-profile-modal settings-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Settings</h3>
-
-            <div className="flex-space">
-              <div>
-                <strong>Theme</strong>
-                <div className="desc">Toggle dark/light mode</div>
-              </div>
-
-              {/* SAME SWITCH */}
-              <div className="theme-switch" onClick={handleThemeToggle}>
-                <div className={`switch ${darkMode ? "on" : ""}`}>
-                  <div className="circle"></div>
-                </div>
-                <span>{darkMode ? "Dark Mode" : "Light Mode"}</span>
-              </div>
-            </div>
-
-            <div className="modal-buttons">
-              <button className="cancel-btn" onClick={() => setShowSettings(false)}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 🔐 Logout */}
-      {showLogoutModal && (
-        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Are you sure you want to logout?</h3>
-            <div className="modal-buttons">
-              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
-              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

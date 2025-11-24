@@ -1,17 +1,14 @@
 import Event from "../models/Event.js";
 import Registration from "../models/Registration.js";
 import Feedback from "../models/Feedback.js";
-import Activity from "../models/Activity.js";
 
-// 📌 DASHBOARD STATS
+/* =================== DASHBOARD STATS =================== */
 export const getDashboardStats = async (req, res) => {
   try {
     const totalEvents = await Event.countDocuments();
     const activeEvents = await Event.countDocuments({ status: "Active" });
     const totalRegistrations = await Registration.countDocuments();
-    const pendingApprovals = await Registration.countDocuments({
-      status: "Pending",
-    });
+    const pendingApprovals = await Registration.countDocuments({ status: "Pending" });
 
     res.json({
       totalEvents,
@@ -24,23 +21,16 @@ export const getDashboardStats = async (req, res) => {
   }
 };
 
-// 📌 CREATE EVENT
+/* =================== CRUD EVENTS =================== */
 export const createEvent = async (req, res) => {
   try {
     const event = await Event.create(req.body);
-
-    await Activity.create({
-      eventName: event.title,
-      action: "New Event Created",
-    });
-
     res.status(201).json(event);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// 📌 GET ALL EVENTS
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find().sort({ createdAt: -1 });
@@ -50,41 +40,25 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-// 📌 UPDATE EVENT
 export const updateEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-
-    await Activity.create({
-      eventName: event.title,
-      action: "Event Updated",
-    });
-
+    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(event);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// 📌 DELETE EVENT
 export const deleteEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
-
-    await Activity.create({
-      eventName: event.title,
-      action: "Event Deleted",
-    });
-
+    await Event.findByIdAndDelete(req.params.id);
     res.json({ message: "Event deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// 📌 GET ADMIN VIEW REGISTRATIONS
+/* =================== REGISTRATIONS =================== */
 export const getRegistrations = async (req, res) => {
   try {
     const registrations = await Registration.find().populate("eventId");
@@ -94,7 +68,6 @@ export const getRegistrations = async (req, res) => {
   }
 };
 
-// 📌 APPROVE / REJECT REGISTRATION
 export const updateRegistrationStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -104,18 +77,75 @@ export const updateRegistrationStatus = async (req, res) => {
       { new: true }
     ).populate("eventId");
 
-    await Activity.create({
-      eventName: registration.eventId.title,
-      action: `Registration ${status}`,
-    });
-
     res.json(registration);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// 📌 GET FEEDBACKS
+/* =================== FEEDBACK =================== */
+// 🟢 CREATE OR ONE-TIME UPDATE FEEDBACK
+export const submitFeedback = async (req, res) => {
+  try {
+    const { eventId, name, email, rating, comments } = req.body;
+    const cleanedEmail = email.toLowerCase();
+
+    let existing = await Feedback.findOne({ eventId, email: cleanedEmail });
+
+    // 🔴 If feedback already exists AND edit already used
+    if (existing && existing.editCount >= 1) {
+      return res.status(403).json({
+        success: false,
+        message: "You already edited your feedback once. Further changes are not allowed."
+      });
+    }
+
+    // 🔵 If feedback exists, update ONCE
+    if (existing) {
+      existing.rating = rating;
+      existing.comments = comments;
+      existing.editCount += 1; // 🟣 Increase edit count
+      await existing.save();
+      return res.json({ success: true, message: "Feedback updated successfully" });
+    }
+
+    // 🟢 Create new feedback
+    await Feedback.create({
+      eventId,
+      name,
+      email: cleanedEmail,
+      rating,
+      comments,
+      editCount: 0
+    });
+
+    // Update student registration flag
+    await Registration.updateOne(
+      { eventId, studentEmail: cleanedEmail },
+      { $set: { feedbackGiven: true } }
+    );
+
+    res.json({ success: true, message: "Feedback submitted successfully" });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// 🟡 CHECK IF FEEDBACK EXISTS (for frontend)
+export const checkFeedback = async (req, res) => {
+  try {
+    const { eventId, email } = req.params;
+    const cleanedEmail = email.toLowerCase();
+
+    const feedback = await Feedback.findOne({ eventId, email: cleanedEmail });
+    res.json({ feedback });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/* =================== ADMIN VIEW FEEDBACKS =================== */
 export const getFeedbacks = async (req, res) => {
   try {
     const feedbacks = await Feedback.find().populate("eventId", "title");
@@ -125,7 +155,7 @@ export const getFeedbacks = async (req, res) => {
   }
 };
 
-// 📌 RECENT ACTIVITIES
+/* =================== RECENT ACTIVITY =================== */
 export const getRecentActivity = async (req, res) => {
   try {
     const recentEvents = await Event.find()
@@ -142,61 +172,5 @@ export const getRecentActivity = async (req, res) => {
     res.json(formattedActivity);
   } catch (err) {
     res.status(500).json({ error: err.message });
-  }
-};
-
-// 📌 SUBMIT / UPDATE FEEDBACK (NO DUPLICATE)
-export const submitFeedback = async (req, res) => {
-  try {
-    const { eventId, name, email, rating, comments } = req.body;
-
-    const cleanedEmail = email.trim().toLowerCase();
-
-    // 🔍 Check existing feedback
-    let existing = await Feedback.findOne({ eventId, email: cleanedEmail });
-
-    if (existing) {
-      existing.rating = rating;
-      existing.comments = comments;
-      await existing.save();
-
-      await Registration.updateOne(
-        { eventId, studentEmail: cleanedEmail },
-        { $set: { feedbackGiven: true } }
-      );
-
-      return res.json({ success: true, message: "Feedback updated" });
-    }
-
-    // 🆕 Add new feedback
-    await Feedback.create({
-      eventId,
-      name,
-      email: cleanedEmail,
-      rating,
-      comments,
-    });
-
-    await Registration.updateOne(
-      { eventId, studentEmail: cleanedEmail },
-      { $set: { feedbackGiven: true } }
-    );
-
-    res.json({ success: true, message: "Feedback submitted" });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-// 📌 CHECK IF FEEDBACK EXISTS
-export const checkFeedback = async (req, res) => {
-  try {
-    const { eventId, email } = req.params;
-    const cleanedEmail = email.trim().toLowerCase();
-
-    const feedback = await Feedback.findOne({ eventId, email: cleanedEmail });
-    res.json({ feedback });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
   }
 };
