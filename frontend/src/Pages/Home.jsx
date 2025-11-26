@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "../Styles/Home.css";
 import { useNavigate } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaMoon, FaSun } from "react-icons/fa";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -62,11 +62,10 @@ const Home = () => {
 
         {/* RIGHT SIDE */}
         <div className="nav-right">
-          {/* ⭐ Modern Switch instead of icon */}
-          <label className="home-theme-switch">
-            <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
-            <span className="home-slider"></span>
-          </label>
+          {/* 🌙/☀ ICON THEME SWITCH */}
+          <div className="home-theme-icon" onClick={toggleTheme}>
+            {isDarkMode ? <FaSun /> : <FaMoon />}
+          </div>
 
           {!isLoggedIn ? (
             <div className="nav-actions">
@@ -79,13 +78,12 @@ const Home = () => {
             </button>
           )}
 
-          {/* Hamburger */}
           <div className={`nav-toggle ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <FaTimes /> : <FaBars />}
           </div>
         </div>
 
-        {/* MOBILE SIDEBAR MENU */}
+        {/* MOBILE MENU */}
         <div className={`nav-links ${menuOpen ? "active" : ""}`}>
           <a onClick={() => handleNavClick("home")}>Home</a>
           <a onClick={() => handleNavClick("events")}>Events</a>
@@ -108,7 +106,6 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* 🔥 REST OF PAGE SAME */}
       {/* HERO */}
       <section className="hero-section">
         <div className="hero-left">

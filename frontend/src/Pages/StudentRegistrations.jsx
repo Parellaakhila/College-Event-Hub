@@ -452,10 +452,25 @@ useEffect(() => {
           <div className="edit-profile-modal settings-modal" onClick={(e) => e.stopPropagation()}>
             <h3>Confirm Deletion</h3>
             <p>Are you sure you want to delete this registration?</p>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-              <button className="cancel-btn" onClick={() => setDeleteModalOpen(false)}>No</button>
-              <button className="delete-btn" onClick={handleDelete} disabled={deleting}>{deleting ? "Deleting..." : "Yes, Delete"}</button>
-            </div>
+            <div style={{ display: "flex", gap: 10, width: "100%" }}>
+  <button
+    className="cancel-btn"
+    style={{ flex: 1 }}
+    onClick={() => setDeleteModalOpen(false)}
+  >
+    No
+  </button>
+
+  <button
+    className="delete-btn"
+    style={{ flex: 1 }}
+    onClick={handleDelete}
+    disabled={deleting}
+  >
+    {deleting ? "Deleting..." : "Yes"}
+  </button>
+</div>
+
           </div>
         </div>
       )}

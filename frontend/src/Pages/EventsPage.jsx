@@ -13,23 +13,14 @@ import {
   FaBell,
   FaCog,
   FaSignOutAlt,
-  FaCheckCircle,
-  FaTimes,
-  FaClock,
   FaTrash,
-  FaCommentDots,
   FaClipboardList as FaClipboardList2,
 } from "react-icons/fa";
 
 import { FaEdit, FaUsers } from "react-icons/fa";
 import { notifySuccess, notifyError } from "../utils/toast";
 
-/**
- * EventsPage
- * - userRole = "student" | "admin"
- * - Student view wrapped with Sidebar + Navbar + Notifications (same look as StudentRegistrations)
- * - Admin view left as original and rendered inside AdminLayout (unchanged)
- */
+
 const EventsPage = ({ userRole = "student" }) => {
   const [events, setEvents] = useState([]);
   const [registrations, setRegistrations] = useState([]); // used for student notifications & isRegistered

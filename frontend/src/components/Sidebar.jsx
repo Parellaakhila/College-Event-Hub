@@ -18,14 +18,12 @@ const Sidebar = ({ sidebarOpen = false, closeSidebar = () => {}, onNavigate = ()
     { path: "/admin/activity", icon: FaFileAlt, label: "Activity Log" },
   ];
 
-  // 👇 FIX: Close sidebar only on small screens
   const handleNavigation = (path) => {
     onNavigate(path);
     if (window.innerWidth <= 1100) {
       closeSidebar();
     }
   };
-  
 
   return (
     <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>

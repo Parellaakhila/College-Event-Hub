@@ -505,3 +505,11 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.cancel-btn,
+.delete-btn {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 10px 0 !important;
+}
