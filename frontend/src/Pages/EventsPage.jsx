@@ -29,7 +29,7 @@ const EventsPage = ({ userRole = "student" }) => {
   const [student, setStudent] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
+const [showLogoutModal, setShowLogoutModal] = useState(false);
   const categories = ["All", "This Week", "Technical", "Sports", "Workshop", "Cultural"];
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -921,12 +921,22 @@ const EventsPage = ({ userRole = "student" }) => {
               <div className="profile-dropdown">
                 <p onClick={() => { setShowProfileMenu(false); navigate("/student/profile"); }}><FaUserCircle /> View Profile</p>
                 <p onClick={() => { setShowSettings(true); setShowProfileMenu(false); }}><FaCog /> Settings</p>
-                <p onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}><FaSignOutAlt /> Logout</p>
+                 <p onClick={() => { setShowLogoutModal(true); }}><FaSignOutAlt /> Logout</p>
               </div>
             )}
           </div>
         </nav>
-
+{showLogoutModal && (
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Are you sure you want to logout?</h3>
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
+              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
         {/* Header (keeps simple title per option 2) */}
         <div className="registrations-header">
           <h2>Discover Exciting Events</h2>

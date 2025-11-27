@@ -26,7 +26,7 @@ const StudentRegistrations = () => {
 const [sidebarOpen, setSidebarOpen] = useState(
   localStorage.getItem("sidebarOpen") === "true"
 );
-
+const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -390,7 +390,7 @@ useEffect(() => {
               <div className="profile-dropdown">
                 <p onClick={() => { setShowProfileMenu(false); navigate("/student/profile"); }}><FaUserCircle /> View Profile</p>
                 <p onClick={() => { setShowSettings(true); setShowProfileMenu(false); }}><FaCog /> Settings</p>
-                <p onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}><FaSignOutAlt /> Logout</p>
+                <p onClick={() => { setShowLogoutModal(true); }}><FaSignOutAlt /> Logout</p>
               </div>
             )}
           </div>
@@ -471,6 +471,17 @@ useEffect(() => {
   </button>
 </div>
 
+          </div>
+        </div>
+      )}
+      {showLogoutModal && (
+        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Are you sure you want to logout?</h3>
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
+              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
+            </div>
           </div>
         </div>
       )}
