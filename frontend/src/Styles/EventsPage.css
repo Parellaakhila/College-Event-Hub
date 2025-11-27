@@ -632,3 +632,28 @@ body.modal-open .topbar {
     font-size: 1.25rem;
   }
 }
+
+/* Extra-small devices: narrow phones (≤480px) */
+@media (max-width: 480px) {
+  .events-page-student { padding: 12px 10px; }
+  .events-header h2 { font-size: 1.4rem; }
+  .events-header { gap: 8px; }
+  .search-input { width: 100%; }
+  .events-grid { gap: 14px; }
+  .event-card img { height: 140px; }
+  .event-info { padding: 12px; }
+  .event-info h3 { font-size: 1rem; }
+  .event-info p { font-size: 0.92rem; }
+  .btn { padding: 8px 14px; font-size: 0.92rem; }
+  .modal.confirm-delete { max-width: 92%; padding: 12px; }
+}
+
+/* Very small phones (≤360px) */
+@media (max-width: 360px) {
+  .events-page-student { padding: 10px 8px; }
+  .events-header h2 { font-size: 1.2rem; }
+  .event-card img { height: 120px; }
+  .event-info h3 { font-size: 0.98rem; }
+  .event-info p { font-size: 0.85rem; }
+  .btn { padding: 7px 12px; font-size: 0.85rem; }
+}

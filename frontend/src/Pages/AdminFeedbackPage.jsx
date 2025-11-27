@@ -90,7 +90,11 @@ const AdminFeedbackPage = () => {
   }
 
   return (
-    <AdminLayout currentPath={location.pathname} onNavigate={handleNavigation}>
+    <AdminLayout
+  currentPath={location.pathname}
+  onNavigate={(p) => navigate(p)}
+>
+
       <div className="admin-feedback-container">
         <ToastContainer />
         <div className="feedback-header">

@@ -6,6 +6,7 @@
   overflow-x: hidden;
   transition: all 0.3s ease-in-out;
   font-family: "Poppins", sans-serif;
+  
 }
 
 .sidebar {
@@ -18,6 +19,7 @@
   position: fixed;
   height: 100vh;
   z-index: 1000;
+  display: flex;
 }
 
 .sidebar.open {
@@ -356,8 +358,9 @@
 .save-btn {
   background: linear-gradient(135deg, #0757db, #3b82f6);
   color: #fff;
-   margin-right: 20%;
-   width:30%;
+   margin-right: 6%;
+   margin-left: 7%;
+   width:50%;
 }
 
 .save-btn:hover {
@@ -369,6 +372,7 @@
   background: #e5e7eb;
   color: #333;
   margin-right: 8%;
+  min-width: 40%;
 }
 
 .cancel-btn:hover {
@@ -381,7 +385,7 @@
   margin-right: 6%;
   padding: 7px 12px;
   font-size: 0.92rem;
-  min-width: 35%;
+  min-width: 43%;
 }
 
 .logout-modal .save-btn:hover {
@@ -866,16 +870,168 @@
     gap: 10px;
   }
 
-  .notification,
-  .profile-avatar,
-  .theme-switch {
-    width: 34px;
-    height: 34px;
-    font-size: 1rem;
-    padding: 4px;
+  
+}
+
+/* ===========================
+   RESPONSIVE: Desktop / Tablet / Small
+   - Desktop (>=1200px): full sidebar (250px)
+   - Tablet (768px-1199px): slightly narrower sidebar (200px)
+   - Small (600px-767px): collapsed sidebar (icons only, 72px)
+   - Mobile (<600px): sidebar hidden by default (use .sidebar.open to show)
+   Also support a programmatic collapsed state via `.dashboard-container.sidebar-collapsed`.
+*/
+
+@media (min-width: 1200px) {
+  .sidebar { width: 250px; }
+  .dashboard-container.sidebar-open .main-content { margin-left: 250px; }
+  .dashboard-container.sidebar-collapsed .main-content { margin-left: 72px; }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .sidebar { width: 200px; }
+  .dashboard-container.sidebar-open .main-content { margin-left: 200px; }
+  /* collapsed variant */
+  .sidebar.collapsed { width: 72px; }
+  .dashboard-container.sidebar-collapsed .main-content { margin-left: 72px; }
+  /* make topbar slightly tighter */
+  .topbar { padding: 10px 16px; }
+}
+
+@media (min-width: 600px) and (max-width: 767px) {
+  /* small screens: collapse sidebar by default to icons-only width */
+  .sidebar { width: 72px; }
+  .sidebar .sidebar-header { display: none; }
+  .sidebar .sidebar-menu li { padding: 12px; justify-content: center; }
+  .sidebar .sidebar-menu li span { display: none; }
+  .dashboard-container.sidebar-open .main-content { margin-left: 72px; }
+  .topbar { padding: 10px 12px; }
+}
+
+/* Mobile top-nav for <=599px is defined earlier to present the sidebar as a
+   horizontal top navigation bar. The older off-canvas rules were removed
+   to avoid conflicting behavior. */
+
+/* Small helper styles for collapsed sidebar state */
+.sidebar.collapsed { width: 72px; overflow: hidden; }
+.sidebar.collapsed .sidebar-menu li { justify-content: center; }
+.sidebar.collapsed .sidebar-menu li .icon-only { display: inline-block; }
+.sidebar.collapsed .sidebar-menu li .label { display: none; }
+
+/* ===========================
+   Modern Header (opt-in)
+   Usage: add class `header-modern` to your `.topbar` element:
+   <div class="topbar header-modern"> ... </div>
+   This block is intentionally namespaced so it doesn't conflict
+   with the project's existing `.topbar` rules unless you opt in.
+=========================== */
+.header-modern {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 2px 10px rgba(2,6,23,0.04);
+}
+
+.header-modern .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-modern .brand .logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg,#0757db,#3b82f6);
+  flex-shrink: 0;
+}
+
+.header-modern .brand .title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0757db;
+  white-space: nowrap;
+}
+
+.header-modern .search {
+  flex: 1 1 420px;
+  max-width: 540px;
+  margin: 0 12px;
+}
+
+.header-modern .search input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6e9ef;
+  background: #fafafa;
+}
+
+.header-modern .right-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-modern .icon-btn { padding: 8px; border-radius: 10px; }
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .header-modern { padding: 14px 36px; }
+  .header-modern .brand .title { font-size: 1.25rem; }
+  .header-modern .search { max-width: 640px; }
+}
+
+/* Desktop / small laptop */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .header-modern { padding: 12px 24px; }
+  .header-modern .search { max-width: 420px; }
+  .header-modern .brand .title { font-size: 1.08rem; }
+}
+
+/* Small tablets / large phones */
+@media (min-width: 600px) and (max-width: 767px) {
+  .header-modern { padding: 10px 14px; gap: 8px; }
+  .header-modern .search { max-width: 320px; }
+}
+
+/* Mobile: compact, grid layout to center title */
+@media (max-width: 599px) {
+  .header-modern {
+    display: grid;
+    grid-template-columns: 48px 1fr 48px; /* menu - center - controls */
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
   }
 
-  .notification svg {
-    font-size: 1rem;
-  }
+  .header-modern .brand .title { display: none; }
+  .header-modern .search { display: none; }
+  .header-modern .brand .logo { width: 36px; height: 36px; }
+  .header-modern .menu-icon { display: inline-flex; justify-self: start; }
+  .header-modern .right-controls { justify-self: end; gap: 8px; }
 }
+
+/* Extra small phones */
+@media (max-width: 420px) {
+  .header-modern { grid-template-columns: 44px 1fr 44px; padding: 6px 8px; }
+  .header-modern .icon-btn { padding: 6px; }
+  .header-modern .brand .logo { width: 32px; height: 32px; }
+}
+
+/* Utility: show search on mobile when a .show-search helper is toggled */
+.header-modern.show-search { grid-template-columns: 1fr; }
+.header-modern.show-search .search { display: block; max-width: 100%; margin: 6px 0; }
+.header-modern.show-search .brand .title,
+.header-modern.show-search .right-controls { display: none; }
+
+

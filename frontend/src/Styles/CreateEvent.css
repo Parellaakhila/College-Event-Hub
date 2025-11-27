@@ -80,7 +80,7 @@
 }
 
 .create-btn,
-.cancel-btn {
+.cancel-btnc {
   padding: 12px 25px;
   font-size: 1rem;
   border: none;
@@ -103,12 +103,13 @@
 }
 
 /* Cancel button */
-.cancel-btn {
+.cancel-btnc {
   background: #dee2e6;
   color: #333;
+  min-width: 20%;
 }
 
-.cancel-btn:hover {
+.cancel-btnc:hover {
   background: #adb5bd;
   color: #fff;
 }
@@ -138,7 +139,7 @@
   }
 
   .create-btn,
-  .cancel-btn {
+  .cancel-btnc {
     width: 100%;
   }
 }

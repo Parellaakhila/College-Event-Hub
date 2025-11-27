@@ -1,176 +1,266 @@
-/* ===== Admin Feedbacks Wrapper ===== */
+/* ============================================================
+   🌟 Admin Feedback Page (Same Style as Activity Log Page)
+   ============================================================ */
+
+/* ---------- Wrapper ---------- */
 .admin-feedback-container {
   padding: 30px;
-  background: #f9fafb;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
 
-/* ===== Header ===== */
-.feedback-header h2 {
-  margin: 0;
-  font-size: 1.8rem;
+/* ---------- Panel / Main Card ---------- */
+.feedback-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* ---------- Header ---------- */
+.feedback-panel h3 {
+  margin: 0 0 18px 0;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #111827;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.feedback-subtitle {
-  color: #6b7280;
-  margin-top: 4px;
+.feedback-panel h3::before {
+  content: "💬";
+  font-size: 1.3rem;
 }
 
-/* ===== Search Bar ===== */
+/* Fade Animation */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Search Bar ---------- */
 .feedback-search-container {
   margin: 20px 0;
+  width: 100%;
 }
 
 .feedback-search-input {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  font-size: 1rem;
-  outline: none;
-  transition: 0.25s;
+  padding: 13px 18px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  font-size: 0.95rem;
+  transition: 0.25s ease;
 }
 
 .feedback-search-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #0757db;
+  box-shadow: 0 0 0 3px rgba(7, 87, 219, 0.25);
 }
 
-/* ===== Table Wrapper ===== */
+/* ============================================================
+   Table Wrapper + Table
+   ============================================================ */
 .feedback-table-wrapper {
-  background: white;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  width: 100%;
   overflow-x: auto;
+  margin-top: 10px;
 }
 
-/* ===== Table ===== */
 .feedback-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 900px;
 }
 
-.feedback-table thead {
-  background: #2563eb;
-  color: white;
+/* Header */
+.feedback-table th {
+  background: linear-gradient(90deg, #0757db, #0a68ff);
+  color: #ffffff;
+  padding: 16px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.feedback-table th,
+.feedback-table th:last-child {
+  border-right: none;
+}
+
+/* Rows */
 .feedback-table td {
-  padding: 12px 10px;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 12px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+}
+
+.feedback-table tbody tr {
+  transition: 0.25s ease;
 }
 
 .feedback-table tbody tr:hover {
-  background: #f3f4f6;
+  background: #f0f7ff;
+  transform: scale(1.002);
 }
 
+/* Comments Wrap */
 .feedback-comments {
-  max-width: 300px;
+  max-width: 380px;
   white-space: normal;
   word-wrap: break-word;
 }
 
-/* ===== Delete Button ===== */
+/* Delete Button */
 .feedback-delete-btn {
-  background: none;
   border: none;
-  color: #dc2626;
+  background: none;
+  color: #ef4444;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  transition: 0.2s ease;
 }
 
 .feedback-delete-btn:hover {
-  color: #b91c1c;
+  color: #dc2626;
+  transform: scale(1.18);
 }
 
-/* ===== Empty State ===== */
+/* Empty State */
 .feedback-empty {
   text-align: center;
-  padding: 40px;
-  color: #6b7280;
+  padding: 40px 0;
   font-size: 1.1rem;
+  color: #0757db;
+  font-weight: 600;
 }
 
-/* ===== Modal Overlay ===== */
+/* ============================================================
+   Delete Modal – Glass UI
+   ============================================================ */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
+  inset: 0;
+  background: rgba(0,0,0,0.55);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 18px;
+  backdrop-filter: blur(3px);
+  z-index: 1000;
 }
 
-/* ===== Delete Modal ===== */
 .feedback-delete-modal {
-  background: white;
-  width: 380px;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+  width: 360px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  animation: popup 0.3s ease;
   position: relative;
-  animation: fadeIn 0.25s ease;
 }
 
-.modal-close-btn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  color: #6b7280;
-  cursor: pointer;
-  position: absolute;
-  top: 12px;
-  right: 12px;
+@keyframes popup {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-warning {
+  margin-top: 8px;
   color: #dc2626;
-  margin-top: 5px;
+  font-size: 0.9rem;
 }
 
 .modal-actions {
-  margin-top: 20px;
+  margin-top: 26px;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 14px;
+}
+
+.modal-delete-btn,
+.modal-cancel-btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s ease;
 }
 
 .modal-delete-btn {
-  background: #dc2626;
+  background: #ef4444;
   color: white;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .modal-delete-btn:hover {
-  background: #b91c1c;
+  background: #dc2626;
 }
 
 .modal-cancel-btn {
   background: #6b7280;
   color: white;
-  padding: 10px 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .modal-cancel-btn:hover {
   background: #4b5563;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+/* ============================================================
+   Responsive — Mobile Stack Table
+   ============================================================ */
+@media (max-width: 768px) {
+
+  .feedback-panel {
+    padding: 20px;
+  }
+
+  .feedback-table,
+  .feedback-table thead,
+  .feedback-table tbody,
+  .feedback-table th,
+  .feedback-table td,
+  .feedback-table tr {
+    display: block;
+  }
+
+  .feedback-table thead {
+    display: none;
+  }
+
+  .feedback-table tbody tr {
+    margin-bottom: 14px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .feedback-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .feedback-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #0757db;
+    margin-right: 10px;
+  }
+
+  .feedback-table td:last-child {
+    border-bottom: none;
+  }
 }

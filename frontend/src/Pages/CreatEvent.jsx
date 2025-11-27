@@ -146,7 +146,7 @@ const CreateEvent = () => {
           <button type="submit" className="create-btn" disabled={loading}>
             {loading ? (isEdit ? "Updating..." : "Creating...") : (isEdit ? "Update Event" : "Create Event")}
           </button>
-          <button type="button" className="cancel-btn" onClick={() => navigate("/admin")}>
+          <button type="button" className="cancel-btnc" onClick={() => navigate("/admin")}>
             Cancel
           </button>
         </div>
