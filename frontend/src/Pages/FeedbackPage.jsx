@@ -10,7 +10,6 @@ const FeedbackPage = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
 
-  // Get logged user
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("user"));
@@ -19,8 +18,9 @@ const FeedbackPage = () => {
     }
   }, []);
 
-  const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [event, setEvent] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
 
   const [formData, setFormData] = useState({
     name: user?.fullName || user?.name || "",
@@ -30,214 +30,171 @@ const FeedbackPage = () => {
     _id: null,
   });
 
-  // 🔒 Lock state
-  const [isLocked, setIsLocked] = useState(false);
+  const lockKey = `fb_lock_${eventId}_${user?.email}`; // 💾 lock key
 
-  // ===================== FETCH EVENT =====================
+  /* =========== FETCH EVENT =========== */
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      toast.warn("Please log in to continue", { position: "top-center" });
-      navigate("/login");
-      return;
-    }
-
-    if (!eventId || !/^[0-9a-fA-F]{24}$/.test(eventId)) {
-      setLoading(false);
-      toast.error("Invalid event ID.", { position: "top-center" });
-      navigate("/student/registrations");
-      return;
-    }
-
-    const controller = new AbortController();
+    if (!user) return navigate("/login");
 
     const fetchEvent = async () => {
-      setLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/events/${eventId}`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(`http://localhost:5000/api/events/${eventId}`);
         const data = await res.json();
         if (!res.ok) throw new Error();
         setEvent(data.event || data);
       } catch {
-        toast.error("Event not found or server error", { position: "top-center" });
+        toast.error("Event not found ⚠️");
         setEvent(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchEvent();
-    return () => controller.abort();
   }, [eventId, navigate, user]);
 
-  // ===================== CHECK EXISTING FEEDBACK =====================
+  /* =========== LOAD FEEDBACK & LOCK =========== */
   useEffect(() => {
-    const checkFeedback = async () => {
-      if (!user?.email || !eventId) return;
+    if (!user?.email || !eventId) return;
+
+    // 🔐 if already edited once, lock
+    if (localStorage.getItem(lockKey) === "true") setIsLocked(true);
+
+    const loadFeedback = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/feedback/${eventId}/${user.email}`
-        );
+        const res = await fetch("http://localhost:5000/api/feedback");
         const data = await res.json();
 
-        if (res.ok && data.feedback) {
-          setFormData({
-            name: data.feedback.name,
-            email: data.feedback.email,
-            rating: data.feedback.rating,
-            comments: data.feedback.comments,
-            _id: data.feedback._id,
-          });
+        if (data.success) {
+          const existing = data.feedbacks.find(
+            (fb) => fb.eventId?._id === eventId && fb.email === user.email
+          );
 
-          // 🔒 If already edited once, disable editing
-          if (data.feedback.editCount >= 1) setIsLocked(true);
+          if (existing) {
+            setFormData({
+              name: existing.name,
+              email: existing.email,
+              rating: existing.rating,
+              comments: existing.comments,
+              _id: existing._id, // 💾 Detect first edit
+            });
+          }
         }
-      } catch (err) {
-        console.error("Check feedback error:", err);
-      }
+      } catch {}
     };
 
-    checkFeedback();
-  }, [user?.email, eventId]);
+    loadFeedback();
+  }, [eventId, user?.email]);
 
-  // ===================== INPUT HANDLERS =====================
-  const handleChange = (e) => {
-    if (isLocked) return; // ⛔ Stop editing if locked
-    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
-  };
-
-  const handleStarClick = (value) => {
-    if (isLocked) return;
-    setFormData((p) => ({ ...p, rating: value }));
-  };
-
-  // ===================== SUBMIT =====================
+  /* =========== SUBMIT/EDIT WITH ONLY ONE EDIT =========== */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLocked) return; // ⛔ Block submit when locked
+    if (isLocked) return; // ❌ cannot submit after locked
 
-    if (!formData.rating || formData.comments.trim().length === 0) {
-      toast.error("Please provide a rating and comments", { position: "top-center" });
-      return;
+    if (!formData.rating || !formData.comments.trim()) {
+      return toast.error("Rating & comments required!");
     }
-
-    const payload = {
-      eventId,
-      name: formData.name,
-      email: formData.email,
-      rating: formData.rating,
-      comments: formData.comments,
-    };
 
     try {
       const res = await fetch("http://localhost:5000/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...formData, eventId }),
       });
-
       const data = await res.json();
 
-      if (res.ok && data.success) {
-        toast.success(
-          formData._id ? "✏️ Feedback Updated!" : "🎉 Feedback Submitted!",
-          { position: "top-center", autoClose: 1500 }
-        );
+      if (data.success) {
+        // ⭐ first time submit
+        if (!formData._id) {
+          toast.success("🎉 Feedback Submitted!", { autoClose: 1400 });
+        } else {
+          // 🔒 second submit = edit → lock forever
+          toast.success("✏️ Feedback Updated!", { autoClose: 1400 });
+          localStorage.setItem(lockKey, "true");
+          setIsLocked(true);
+        }
+
         setTimeout(() => navigate("/student/registrations"), 1400);
-      } else throw new Error(data.message);
-    } catch (err) {
-      toast.error(err.message || "Network error – try again later", { position: "top-center" });
+      }
+    } catch {
+      toast.error("Server error");
     }
   };
 
-  // ===================== UI RENDER =====================
+  /* ======== UI ======== */
+  if (loading) return <h3 style={{ textAlign: "center" }}>Loading…</h3>;
 
-  if (loading) {
+  if (!event)
     return (
-      <div className="feedback-wrapper" style={{ minHeight: "60vh" }}>
-        <div style={{ textAlign: "center", width: "100%" }}>
-          <h3>Loading event details...</h3>
-        </div>
+      <div className="feedback-wrapper">
+        <h3>Event not found</h3>
+        <button className="back-btn" onClick={() => navigate("/student/registrations")}>
+          Back
+        </button>
       </div>
     );
-  }
-
-  if (!event) {
-    return (
-      <div className="feedback-wrapper" style={{ minHeight: "60vh" }}>
-        <div style={{ textAlign: "center", width: "100%" }}>
-          <h3>Event not found</h3>
-          <button className="back-btn" onClick={() => navigate("/student/registrations")}>
-            Back to My Events
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="feedback-wrapper">
       <ToastContainer />
       <div className="feedback-card-container">
-
-        {/* EVENT PREVIEW */}
+        {/* LEFT */}
         <div className="feedback-left">
           <img
-            src={event.image || "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"}
-            alt={event.title || "Event"}
+            src={
+              event.image ||
+              "https://img.freepik.com/free-vector/event-concept-illustration_114360-931.jpg"
+            }
+            alt="Event"
           />
-          <h2>{event.title || "Untitled Event"}</h2>
-          {event.description && <p className="desc">{event.description}</p>}
-
+          <h2>{event.title}</h2>
+          {event.description && <p>{event.description}</p>}
           <div className="meta">
-            <span>📅 {event.date ? new Date(event.date).toLocaleDateString() : "TBD"}</span>
-            <span>🕒 {event.time || "TBD"}</span>
+            <span>📅 {new Date(event.date).toLocaleDateString()}</span>
+            <span>🕒 {event.time}</span>
           </div>
         </div>
 
-        {/* FORM */}
+        {/* RIGHT */}
         <form className="feedback-right" onSubmit={handleSubmit}>
           <h3>
-            {isLocked ? "Feedback Locked" : formData._id ? "Edit Feedback" : "Submit Feedback"}
+            {isLocked
+              ? "Feedback Locked"
+              : formData._id
+              ? "Edit Feedback (Only Once)"
+              : "Submit Feedback"}
           </h3>
 
           <label>Name</label>
-          <input type="text" name="name" value={formData.name} readOnly />
+          <input readOnly value={formData.name} />
 
           <label>Email</label>
-          <input type="email" name="email" value={formData.email} readOnly />
+          <input readOnly value={formData.email} />
 
           <label>Rating</label>
           <div className="star-row">
             {[1, 2, 3, 4, 5].map((s) => (
               <FaStar
                 key={s}
-                onClick={() => handleStarClick(s)}
+                onClick={() => !isLocked && setFormData({ ...formData, rating: s })}
+                color={s <= formData.rating ? "#f59e0b" : "#ddd"}
                 style={{ cursor: isLocked ? "not-allowed" : "pointer" }}
-                color={s <= formData.rating ? "#f59e0b" : "#e5e7eb"}
-                size={22}
               />
             ))}
           </div>
 
           <label>Comments</label>
           <textarea
-            name="comments"
-            value={formData.comments}
-            onChange={handleChange}
             readOnly={isLocked}
-            placeholder={isLocked ? "You cannot edit feedback anymore." : "Share your thoughts about this event..."}
+            value={formData.comments}
+            onChange={(e) => !isLocked && setFormData({ ...formData, comments: e.target.value })}
             rows={5}
-            required
-          />
+          ></textarea>
 
-          <button className="submit-btn" type="submit" disabled={isLocked}>
-            {isLocked ? "Feedback Locked" : formData._id ? "Edit Feedback" : "Submit Feedback"}
+          <button disabled={isLocked} className="submit-btn">
+            {isLocked ? "Locked" : formData._id ? "Save Edit" : "Submit Feedback"}
           </button>
 
-          <button className="back-btn" type="button" onClick={() => navigate("/student/registrations")}>
+          <button type="button" className="back-btn" onClick={() => navigate("/student/registrations")}>
             Back
           </button>
         </form>
