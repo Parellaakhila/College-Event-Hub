@@ -47,10 +47,10 @@ const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [regPage, setRegPage] = useState(1);
   const REGS_PER_PAGE = 8;
 
-  // modal ref for PDF capture
+ 
   const modalRef = useRef(null);
 
-  // Layout / Navbar / Sidebar states (for student)
+
  const [sidebarOpen, setSidebarOpen] = useState(
   localStorage.getItem("sidebarOpen") === "true"
 );
