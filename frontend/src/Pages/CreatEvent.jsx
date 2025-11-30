@@ -75,7 +75,7 @@ const CreateEvent = () => {
       if (res.data && (res.data.success || res.status === 200 || res.status === 201)) {
         toast.success(isEdit ? "✅ Event updated successfully!" : "🎉 Event created successfully!", {
           position: "top-center",
-          autoClose: 2000,
+          autoClose: 1500,
           theme: "colored",
         });
 

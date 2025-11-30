@@ -170,6 +170,7 @@ const AdminLayout = ({
                             <span className="notif-status"><FaCheckCircle /> Registered</span>
                           </div>
                           <p className="notif-event">Event: <b>{notif.eventName}</b></p>
+                         
                           <small>🕒 {new Date(notif.timestamp).toLocaleString()}</small>
                         </div>
                       ))}

@@ -9,6 +9,59 @@
   padding: 0 20px;          /* left/right gutter that matches navbar */
   box-sizing: border-box;
 }
+.disabled-btn {
+  background-color: #c8c8c8 !important;  /* Light gray */
+  color: #666 !important;                /* Dark gray text */
+  cursor: not-allowed !important;
+  opacity: 0.7;
+  border: 1px solid #aaa;
+}
+/* Tooltip Container */
+.tooltip {
+  position: relative;
+}
+
+/* Tooltip Text */
+.tooltip:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 120%; /* place above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Tooltip Arrow */
+.tooltip:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Hidden by default */
+.tooltip::after,
+.tooltip::before {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.tooltip:hover::after,
+.tooltip:hover::before {
+  opacity: 1;
+}
 
 /* Gradient header – inside .page-inner so no hard left/right margins */
 .registrations-header {
@@ -64,6 +117,47 @@
 /* =======================
    GRID
    ======================= */
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.icon-btn .btn-text {
+  display: none; /* hide text initially */
+  margin-left: 5px;
+}
+
+.icon-btn:hover .btn-text {
+  display: inline-block; /* show text on hover */
+}
+
+.icon-btn.disabled-btn {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.inline-actions .delete-btn {
+  background: #dc3545;
+  margin-right: 5px;
+}
+
+.inline-actions .delete-btn:hover {
+  background: #c82333;
+}
+
+.inline-actions .feedback-btn:hover {
+  background: #0056b3;
+}
 
 .registrations-grid {
   display: grid;

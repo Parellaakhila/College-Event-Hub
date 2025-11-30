@@ -227,7 +227,28 @@ useEffect(() => {
   const filteredOngoing = filterRegistrations(ongoing);
   const filteredUpcoming = filterRegistrations(upcoming);
 
-  const EventCard = ({ reg, colorClass }) => (
+
+const EventCard = ({ reg, colorClass }) => {
+  const isApproved = reg.status === "Approved";
+
+  // Enable feedback ONLY if approved
+  const canFeedback = isApproved;
+
+  const feedbackTitle = !isApproved
+    ? "Feedback available only after approval"
+    : reg.feedbackGiven
+    ? "Edit feedback"
+    : "Leave feedback";
+
+  const feedbackLabel = !isApproved
+    ? "Awaiting Approval"
+    : reg.feedbackGiven
+    ? "Edit Feedback"
+    : "Feedback";
+
+  const canDelete = colorClass === "upcoming" || colorClass === "past";
+
+  return (
     <div className="registration-card">
       <img
         src={
@@ -236,9 +257,16 @@ useEffect(() => {
         }
         alt={reg.eventId?.title || "Event"}
       />
+
       <div className="registration-info">
         <h4>{reg.eventId?.title || "Event Title"}</h4>
-        <p className="meta">📅 {reg.eventId?.date ? new Date(reg.eventId.date).toLocaleDateString() : "TBD"}</p>
+
+        <p className="meta">
+          📅{" "}
+          {reg.eventId?.date
+            ? new Date(reg.eventId.date).toLocaleDateString()
+            : "TBD"}
+        </p>
         <p className="meta">🕒 {reg.eventId?.time || "TBD"}</p>
         <p className="meta">📍 {reg.eventId?.venue || "TBD"}</p>
         <p className="meta">🏷️ {reg.eventId?.category || "N/A"}</p>
@@ -261,39 +289,36 @@ useEffect(() => {
           </div>
 
           <div className="inline-actions">
-            {colorClass === "upcoming" && (
-              <button className="delete-inline-btn" onClick={() => confirmDelete(reg._id)} title="Delete registration">
-                <FaTrash /> Delete
-              </button>
-            )}
-          {colorClass === "past" && (
-  <button
-    className={`feedback-inline-btn ${reg.feedbackLocked ? "disabled-btn" : ""}`}
-    onClick={() => !reg.feedbackLocked && handleFeedback(reg.eventId?._id)}
-    title={
-      reg.feedbackLocked
-        ? "Feedback Locked"
-        : reg.feedbackGiven
-        ? "Edit feedback"
-        : "Leave feedback"
-    }
-    disabled={reg.feedbackLocked}
-  >
-    <FaCommentDots />{" "}
-    {reg.feedbackLocked
-      ? "Locked"
-      : reg.feedbackGiven
-      ? "Edit Feedback"
-      : "Feedback"}
-  </button>
-)}
 
+            {/* DELETE BUTTON for Upcoming + Past */}
+            {canDelete && (
+             <button
+  className="delete-inline-btn tooltip"
+  data-tip="Delete Registration"
+  onClick={() => confirmDelete(reg._id)}
+>
+  <FaTrash />
+</button>
+
+            )}
+
+            {/* FEEDBACK BUTTON */}
+            <button
+  className={`feedback-inline-btn tooltip ${!canFeedback ? "disabled-btn" : ""}`}
+  onClick={() => canFeedback && handleFeedback(reg.eventId?._id)}
+  data-tip={feedbackTitle}
+  disabled={!canFeedback}
+>
+  <FaCommentDots />
+</button>
 
           </div>
         </div>
       </div>
     </div>
   );
+};
+
 
   if (!student) {
     return (
@@ -304,6 +329,7 @@ useEffect(() => {
   }
 
   return (
+    
     <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>

@@ -140,17 +140,28 @@ const StudentDashboard = () => {
   };
 
   // ================= UTILITIES =================
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning ☀️";
-    if (hour < 17) return "Good Afternoon 🌤️";
-    return "Good Evening 🌙";
-  };
+ const getGreeting = (username) => {
+  const hour = new Date().getHours();
+  let greeting = "";
 
+  if (hour < 12) greeting = "Good Morning ☀️";
+  else if (hour < 17) greeting = "Good Afternoon 🌤️";
+  else greeting = "Good Evening 🌙";
+
+  return `${greeting}, ${username}`;
+};
+
+// Get logged-in user
+const user = JSON.parse(localStorage.getItem("user"));
+const username = user?.name || "User";
+
+
+  // Check whether the current student is registered for a given event id
   const isRegistered = (eventId) =>
     registrations.some(
-      (r) => String(r.eventId?._id || r.eventId) === String(eventId)
+      (r) => r?.eventId && (r.eventId._id === eventId || r.eventId === eventId)
     );
+
 
   // ================= UPCOMING EVENTS =================
   const upcomingEvents = events
@@ -270,7 +281,9 @@ const StudentDashboard = () => {
         <div className="dashboard-header hero">
           <div className="hero-content">
             <div className="welcome-text">
-              <h2>{getGreeting()}, <span>{student.name}</span> 👋</h2>
+              <h2>{getGreeting(student.fullName)}👋 </h2>
+        
+
               <p>Welcome back — here’s a quick summary of your events.</p>
             </div>
             <div className="stats-grid center-stats">
