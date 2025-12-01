@@ -235,10 +235,10 @@ const EventCard = ({ reg, colorClass }) => {
   const canFeedback = isApproved;
 
   const feedbackTitle = !isApproved
-    ? "Feedback available only after approval"
+    ? " unavailable"
     : reg.feedbackGiven
     ? "Edit feedback"
-    : "Leave feedback";
+    : " feedback";
 
   const feedbackLabel = !isApproved
     ? "Awaiting Approval"

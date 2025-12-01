@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "../Styles/Registrations.css";
 import AdminLayout from "../Pages/AdminLayout";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,7 +12,7 @@ const RegistrationsPage = () => {
 
   useEffect(() => {
     fetchRegistrations();
-  }, [location.pathname]); // ✅ listen to path changes
+  }, [location.pathname]);
 
   const fetchRegistrations = async () => {
     try {
@@ -53,9 +53,58 @@ const RegistrationsPage = () => {
     }
   };
 
+  
+  const analytics = useMemo(() => {
+    const total = registrations.length;
+    const approved = registrations.filter((r) => r.status === "Approved").length;
+    const pending = registrations.filter((r) => r.status === "Pending").length;
+    const rejected = registrations.filter((r) => r.status === "Rejected").length;
+
+    const approvalRate = total ? ((approved / total) * 100).toFixed(1) : 0;
+
+    return { total, approved, pending, rejected, approvalRate };
+  }, [registrations]);
+
   return (
-    <AdminLayout currentPath={location.pathname} onNavigate={(p) => navigate(p)}>
-      <div className="panel">
+    <AdminLayout
+      currentPath={location.pathname}
+      onNavigate={(p) => navigate(p)}
+    >
+      <div className="panels">
+
+        
+        <h3>Registration Analytics</h3>
+
+        <div className="analytics-container">
+          <div className="analytics-card total">
+            <h4>Total Registrations</h4>
+            <p>{analytics.total}</p>
+          </div>
+
+          <div className="analytics-card approved">
+            <h4>Approved</h4>
+            <p>{analytics.approved}</p>
+          </div>
+
+          <div className="analytics-card pending">
+            <h4>Pending</h4>
+            <p>{analytics.pending}</p>
+          </div>
+
+          <div className="analytics-card rejected">
+            <h4>Rejected</h4>
+            <p>{analytics.rejected}</p>
+          </div>
+
+          <div className="analytics-card rate">
+            <h4>Approval Rate</h4>
+            <p>{analytics.approvalRate}%</p>
+          </div>
+        </div>
+
+        {/* =====================================================
+                📋 REGISTRATIONS TABLE
+        ====================================================== */}
         <h3>Registrations</h3>
         <div className="table-wrapper">
           <table className="registrations-table">
@@ -68,17 +117,17 @@ const RegistrationsPage = () => {
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {registrations.length > 0 ? (
                 registrations.map((reg) => (
                   <tr key={reg._id}>
-                    <td data-label="Event">
-                      {reg.eventId?.title || reg.eventId || "N/A"}
-                    </td>
-                    <td data-label="Student">{reg.studentName}</td>
-                    <td data-label="Email">{reg.studentEmail}</td>
-                    <td data-label="Status">{reg.status}</td>
-                    <td data-label="Actions">
+                    <td>{reg.eventId?.title || "N/A"}</td>
+                    <td>{reg.studentName}</td>
+                    <td>{reg.studentEmail}</td>
+                    <td>{reg.status}</td>
+
+                    <td>
                       {reg.status === "Pending" ? (
                         <div className="action-buttons">
                           <button
@@ -87,6 +136,7 @@ const RegistrationsPage = () => {
                           >
                             Approve
                           </button>
+
                           <button
                             className="reject-btn"
                             onClick={() => updateStatus(reg._id, "Rejected")}
@@ -95,9 +145,7 @@ const RegistrationsPage = () => {
                           </button>
                         </div>
                       ) : (
-                        <span
-                          className={`status-${reg.status.toLowerCase()}`}
-                        >
+                        <span className={`status-${reg.status.toLowerCase()}`}>
                           {reg.status}
                         </span>
                       )}
@@ -114,17 +162,7 @@ const RegistrationsPage = () => {
         </div>
       </div>
 
-      {/* ✅ Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={2500}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="colored"
-      />
+      <ToastContainer theme="colored" position="top-right" autoClose={2500} />
     </AdminLayout>
   );
 };

@@ -19,6 +19,7 @@
 /* Tooltip Container */
 .tooltip {
   position: relative;
+ 
 }
 
 /* Tooltip Text */
@@ -130,6 +131,7 @@
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s ease;
+  
 }
 
 .icon-btn .btn-text {
@@ -148,7 +150,7 @@
 
 .inline-actions .delete-btn {
   background: #dc3545;
-  margin-right: 5px;
+ 
 }
 
 .inline-actions .delete-btn:hover {
@@ -157,6 +159,7 @@
 
 .inline-actions .feedback-btn:hover {
   background: #0056b3;
+
 }
 
 .registrations-grid {
@@ -271,7 +274,7 @@
 
 .status-row .inline-actions {
   display:flex;
-  gap:8px;
+  gap:25px;
   align-items:center;
 }
 

@@ -241,14 +241,15 @@
 }
 
 .logout-modal {
-  width: 340px;
+  width: 740px;
   text-align: center;
+  
 }
 
 .edit-profile-modal h3,
 .logout-modal h3 {
   color: #0757db;
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: 15px;
   text-align: center;
 }
@@ -326,10 +327,10 @@
 
 .logout-modal .save-btn {
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  margin-right: 6%;
+ 
   padding: 7px 12px;
   font-size: 0.92rem;
-  min-width: 43%;
+  min-width: 45%;
 }
 
 .logout-modal .save-btn:hover {

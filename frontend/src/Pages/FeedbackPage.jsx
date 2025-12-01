@@ -21,6 +21,7 @@ const FeedbackPage = () => {
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false); // ✅ NEW: Thank you card
 
   const [formData, setFormData] = useState({
     name: user?.fullName || user?.name || "",
@@ -30,7 +31,7 @@ const FeedbackPage = () => {
     _id: null,
   });
 
-  const lockKey = `fb_lock_${eventId}_${user?.email}`; // 💾 lock key
+  const lockKey = `fb_lock_${eventId}_${user?.email}`;
 
   /* =========== FETCH EVENT =========== */
   useEffect(() => {
@@ -56,7 +57,6 @@ const FeedbackPage = () => {
   useEffect(() => {
     if (!user?.email || !eventId) return;
 
-    // 🔐 if already edited once, lock
     if (localStorage.getItem(lockKey) === "true") setIsLocked(true);
 
     const loadFeedback = async () => {
@@ -75,7 +75,7 @@ const FeedbackPage = () => {
               email: existing.email,
               rating: existing.rating,
               comments: existing.comments,
-              _id: existing._id, // 💾 Detect first edit
+              _id: existing._id,
             });
           }
         }
@@ -85,10 +85,10 @@ const FeedbackPage = () => {
     loadFeedback();
   }, [eventId, user?.email]);
 
-  /* =========== SUBMIT/EDIT WITH ONLY ONE EDIT =========== */
+  /* =========== SUBMIT FEEDBACK =========== */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLocked) return; // ❌ cannot submit after locked
+    if (isLocked) return;
 
     if (!formData.rating || !formData.comments.trim()) {
       return toast.error("Rating & comments required!");
@@ -100,27 +100,32 @@ const FeedbackPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, eventId }),
       });
+
       const data = await res.json();
 
       if (data.success) {
-        // ⭐ first time submit
         if (!formData._id) {
           toast.success("🎉 Feedback Submitted!", { autoClose: 1400 });
         } else {
-          // 🔒 second submit = edit → lock forever
           toast.success("✏️ Feedback Updated!", { autoClose: 1400 });
           localStorage.setItem(lockKey, "true");
           setIsLocked(true);
         }
 
-        setTimeout(() => navigate("/student/registrations"), 1400);
+        // ✅ Show thank-you card
+        setShowThankYou(true);
+
+        // Redirect after delay
+        setTimeout(() => {
+          navigate("/student/registrations");
+        }, 1400);
       }
     } catch {
       toast.error("Server error");
     }
   };
 
-  /* ======== UI ======== */
+  /* ======== LOADING STATE ======== */
   if (loading) return <h3 style={{ textAlign: "center" }}>Loading…</h3>;
 
   if (!event)
@@ -136,8 +141,19 @@ const FeedbackPage = () => {
   return (
     <div className="feedback-wrapper">
       <ToastContainer />
+
+      {/* ✅ THANK YOU MESSAGE CARD */}
+      {showThankYou && (
+        <div className="thank-you-overlay">
+          <div className="thank-you-card">
+            <h2>🎉 Thank You!</h2>
+            <p>Your feedback has been recorded successfully.</p>
+          </div>
+        </div>
+      )}
+
       <div className="feedback-card-container">
-        {/* LEFT */}
+        {/* LEFT SIDE */}
         <div className="feedback-left">
           <img
             src={
@@ -154,7 +170,7 @@ const FeedbackPage = () => {
           </div>
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT SIDE FORM */}
         <form className="feedback-right" onSubmit={handleSubmit}>
           <h3>
             {isLocked
@@ -186,7 +202,9 @@ const FeedbackPage = () => {
           <textarea
             readOnly={isLocked}
             value={formData.comments}
-            onChange={(e) => !isLocked && setFormData({ ...formData, comments: e.target.value })}
+            onChange={(e) =>
+              !isLocked && setFormData({ ...formData, comments: e.target.value })
+            }
             rows={5}
           ></textarea>
 
@@ -194,7 +212,11 @@ const FeedbackPage = () => {
             {isLocked ? "Locked" : formData._id ? "Save Edit" : "Submit Feedback"}
           </button>
 
-          <button type="button" className="back-btn" onClick={() => navigate("/student/registrations")}>
+          <button
+            type="button"
+            className="back-btn"
+            onClick={() => navigate("/student/registrations")}
+          >
             Back
           </button>
         </form>

@@ -1,46 +1,3 @@
-/* ============================================================
-   🌟 Admin Feedback Page (Same Style as Activity Log Page)
-   ============================================================ */
-
-/* ---------- Wrapper ---------- */
-.admin-feedback-container {
-  padding: 30px 10px;
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
-}
-
-/* ---------- Panel / Main Card ---------- */
-.feedback-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-/* ---------- Header ---------- */
-.feedback-panel h3 {
-  margin: 0 0 18px 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.feedback-panel h3::before {
-  content: "💬";
-  font-size: 1.3rem;
-}
-
-/* Fade Animation */
-@keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
 
 /* ---------- Search Bar ---------- */
 .feedback-search-container {
@@ -264,3 +221,121 @@
     border-bottom: none;
   }
 }
+/* ============================================================
+   🌟 ADMIN FEEDBACK PAGE STYLING
+============================================================== */
+
+.admin-feedback-container {
+  padding: 2px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   HEADER
+=========================== */
+.feedback-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+}
+
+
+/* ===========================
+   ANALYTICS SECTION
+=========================== */
+.feedback-analytics {
+  margin-top: 25px;
+}
+
+.feedback-analytics h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.analytics-card {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.analytics-card h4 {
+  color: #444;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.analytics-card p {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* ===========================
+   CHARTS GRID
+=========================== */
+.feedback-charts {
+  margin-top: 35px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.chart-card h4 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  
+}
+
+
+/* When sidebar is open → reduce card size */
+.sidebar-open .charts-grid {
+  grid-template-columns: repeat(auto-fit, minmax(313px, 1fr)) !important;
+}
+
+.sidebar-open .chart-card {
+  padding: 5px !important;
+  transform: scale(0.95); /* optional smooth shrink */
+}
+.sidebar-open .chart-card .recharts-wrapper {
+  width: 100% !important;       /* reduce width safely */
+  max-width: 350px !important; /* ensure it does not stretch */
+  margin-left: -10px !important;
+ 
+  height: 250px !important; 
+     /* keep height consistent */
+}
+
+
+/* Reduce legend font size */
+.sidebar-open .chart-card .recharts-legend-item-text {
+  font-size: 11px !important;
+   margin-left: -3px !important;
+  
+}
+
+
+
