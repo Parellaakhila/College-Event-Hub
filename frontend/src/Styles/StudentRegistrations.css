@@ -293,27 +293,6 @@
    NAVBAR / PROFILE / NOTIF
    ======================= */
 
-.navbar {
-  position:static;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  padding: 12px 20px;
-  background: transparent;
-}
-
-.nav-left {
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.menu-icon {
-  cursor:pointer;
-  font-size:20px;
-}
-
 .logo {
   margin:0;
   font-size:1.15rem;

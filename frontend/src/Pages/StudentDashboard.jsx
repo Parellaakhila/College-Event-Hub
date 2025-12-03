@@ -17,6 +17,7 @@ import {
   FaClipboardList,
 } from "react-icons/fa";
 import { useNavigate, NavLink } from "react-router-dom";
+import StudentLayout from "./StudentLayout";
 
 const StudentDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -65,12 +66,7 @@ const StudentDashboard = () => {
     document.documentElement.classList.toggle("dark", isDark);
   }, []);
 
-  const handleThemeToggle = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    localStorage.setItem("darkMode", next ? "true" : "false");
-    document.documentElement.classList.toggle("dark", next);
-  };
+
 
   // ================= SIDEBAR MEMORY =================
   useEffect(() => {
@@ -184,100 +180,19 @@ const username = user?.name || "User";
     regPage * ITEMS_PER_PAGE
   );
   const regTotalPages = Math.max(1, Math.ceil(registrations.length / ITEMS_PER_PAGE));
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   if (!student) return <div className="loading-screen"><h2>Loading...</h2></div>;
 
   return (
-    <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
+    <StudentLayout currentPath={location.pathname}
+      onNavigate={(p) => navigate(p)}
+      sidebarOpen={sidebarOpen}
+      toggleSidebar={toggleSidebar}>
+   
 
-      {/* SIDEBAR */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-header">
-          <h2>🎓 EventHub</h2>
-        </div>
-        <nav className="sidebar-menu">
-          <NavLink to="/student-dashboard"><FaHome /> Dashboard</NavLink>
-          <NavLink to="/student/events"><FaClipboardList /> Explore Events</NavLink>
-          <NavLink to="/student/registrations"><FaCalendarAlt /> My Registrations</NavLink>
-          <NavLink to="/student/profile"><FaUserCircle /> Profile</NavLink>
-        </nav>
-      </aside>
+  
 
-      {/* MAIN */}
-      <div className={`main-content ${sidebarOpen ? "shifted" : ""}`}>
-
-        {/* NAVBAR */}
-        <nav className="navbar">
-          <div className="nav-left">
-            <FaBars className="menu-icon" onClick={() => setSidebarOpen(!sidebarOpen)} />
-            <h1 className="logo">Student Dashboard</h1>
-          </div>
-
-          <div className="nav-center">
-            <div className="search-bar">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="nav-right" ref={profileRef}>
-            <div className="theme-switch nav-switch" onClick={handleThemeToggle}>
-              {darkMode ? <FaSun /> : <FaMoon />}
-            </div>
-
-            <button className="bell-btn" onClick={handleBellClick}>
-              <FaBell />
-              {unseenApprovedIds.length > 0 && (
-                <span className="badge">{unseenApprovedIds.length}</span>
-              )}
-            </button>
-
-            <div className="profile" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-              <FaUserCircle className="profile-icon" />
-            </div>
-
-            {showProfileMenu && (
-              <div className="profile-dropdown">
-                <p onClick={() => navigate("/student/profile")}><FaUserCircle /> View Profile</p>
-                <p onClick={() => setShowSettings(true)}><FaCog /> Settings</p>
-                <p onClick={() => setShowLogoutModal(true)}><FaSignOutAlt /> Logout</p>
-              </div>
-            )}
-          </div>
-        </nav>
-
-        {/* 🔔 NOTIFICATION DROPDOWN */}
-        {showNotifDropdown && (
-          <div className="notifications-dropdown">
-            <h4>Notifications</h4>
-            <ul className="notif-list">
-              {registrations
-  .filter((r) => r.status === "Approved")
-  .map((r) => (
-    <li key={r._id} className="notif-item">
-      <strong>{r.eventId?.title}</strong>
-      <span className="notif-approved">Approved 🎉</span>
-      <small>
-        {r.eventId?.date
-          ? new Date(r.eventId.date).toLocaleDateString()
-          : "No Date"}
-      </small>
-    </li>
-  ))}
-
-              {registrations.filter((r) => r.status === "Approved").length === 0 && (
-                <p className="no-notif">No new notifications</p>
-              )}
-            </ul>
-          </div>
-        )}
-
-        {/* HERO */}
         <div className="dashboard-header hero">
           <div className="hero-content">
             <div className="welcome-text">
@@ -381,75 +296,13 @@ const username = user?.name || "User";
           )}
         </section>
 
-      </div>
+   
 
-     {showSettings && (
-  <div className="modal-overlay" onClick={() => setShowSettings(false)}>
-    <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
-      <h3>Settings</h3>
+    
+  
 
-      <div className="flex-space">
-        <div>
-          <strong>Theme</strong>
-          <div className="desc">Toggle dark / light mode</div>
-        </div>
-
-        <div
-  onClick={handleThemeToggle}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    padding: "10px 14px",
-    borderRadius: "40px",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "0.22s ease",
-    userSelect: "none",
-    border: `1px solid ${darkMode ? "rgba(255,255,255,0.12)" : "rgba(37,99,235,0.38)"}`,
-    background: darkMode
-      ? "rgba(255,255,255,0.08)"
-      : "rgba(37,99,235,0.12)",
-    color: darkMode ? "#fff" : "var(--primary)"
-  }}
-  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
-  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
->
-  {darkMode ? (
-    <>
-      <FaSun /> <span>Light</span>
-    </>
-  ) : (
-    <>
-      <FaMoon /> <span>Dark</span>
-    </>
-  )}
-</div>
-
-      </div>
-
-      <button className="close-settings" onClick={() => setShowSettings(false)}>
-        Close
-      </button>
-    </div>
-  </div>
-)}
-
-      {/* ========== LOGOUT CONFIRMATION ========== */}
-      {showLogoutModal && (
-        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Are you sure you want to logout?</h3>
-            <div className="modal-buttons">
-              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
-              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
+  
+    </StudentLayout>
   );
 };
 

@@ -19,6 +19,7 @@ import {
   FaBell,
   FaClipboardList,
 } from "react-icons/fa";
+import StudentLayout from "./StudentLayout";
 
 const StudentRegistrations = () => {
   const [registrations, setRegistrations] = useState([]);
@@ -81,11 +82,6 @@ useEffect(() => {
   localStorage.setItem("sidebarOpen", sidebarOpen);
 }, [sidebarOpen]);
 
-  const getApprovedIds = (regs = registrations) =>
-    regs.filter((r) => r.status === "Approved" && r.eventId).map((r) => r._id);
-
-  const seenKey = (email) => `seenApproved_${email || "anon"}`;
-  const [unseenApprovedIds, setUnseenApprovedIds] = useState([]);
 
   useEffect(() => {
   if (!student?.email) return;
@@ -114,8 +110,7 @@ useEffect(() => {
   fetchRegistrations();
 }, [student?.email]);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const toggleProfileMenu = () => setShowProfileMenu((s) => !s);
+  
 
   const handleThemeToggle = () => {
     const next = !darkMode;
@@ -163,16 +158,7 @@ useEffect(() => {
     navigate(`/student/feedback/${eventId}`);
   };
 
-  const handleBellClick = () => {
-    if (!student?.email) return;
-    const seen = JSON.parse(localStorage.getItem(seenKey(student.email))) || [];
-    const approved = getApprovedIds();
-    const newSeen = Array.from(new Set([...seen, ...approved]));
-    localStorage.setItem(seenKey(student.email), JSON.stringify(newSeen));
-    setUnseenApprovedIds([]);
-    setShowNotifDropdown((s) => !s);
-  };
-
+  
   // Categorize events
   const categorizeEvents = () => {
     const now = new Date();
@@ -318,7 +304,7 @@ const EventCard = ({ reg, colorClass }) => {
     </div>
   );
 };
-
+const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   if (!student) {
     return (
@@ -329,99 +315,16 @@ const EventCard = ({ reg, colorClass }) => {
   }
 
   return (
-    
-    <div className={`dashboard-container ${sidebarOpen ? "sidebar-open" : ""}`}>
+    <StudentLayout currentPath={location.pathname}
+      onNavigate={(p) => navigate(p)}
+      sidebarOpen={sidebarOpen}
+      toggleSidebar={toggleSidebar}>
+   
       {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-header">
-          <h2>🎓 EventHub</h2>
-        </div>
-        <nav className="sidebar-menu">
-          <NavLink to="/student-dashboard" onClick={() => {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }} end>
-            <FaHome style={{ marginRight: 10 }} /> Dashboard
-          </NavLink>
-         <NavLink to="/student/events" onClick={() =>  {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }}className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-            <FaClipboardList style={{ marginRight: 10 }} /> Explore Events
-          </NavLink>
-          <NavLink to="/student/registrations" onClick={() =>  {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-            <FaCalendarAlt style={{ marginRight: 10 }} /> My Registrations
-          </NavLink>
-
-          <NavLink to="/student/profile" onClick={() => {
-    if (window.innerWidth <= 1100) setSidebarOpen(false);
-  }} className={({ isActive }) => (isActive ? "active-link" : "")} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-            <FaUserCircle style={{ marginRight: 10 }} /> Profile
-          </NavLink>
-        </nav>
-      </aside>
-
+     
       {/* Main Content */}
-      <div className={`main-content ${sidebarOpen ? "shifted" : ""}`}>
-        <nav className="navbar">
-          <div className="nav-left">
-            <FaBars className="menu-icon" onClick={toggleSidebar} />
-            <h1 className="logo">My Registrations</h1>
-          </div>
-
-          <div className="nav-center">
-            <div className="search-bar">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="nav-right">
-            {/* Notification bell */}
-            <div className="notif-container">
-              <button className="bell-btn" onClick={handleBellClick} title="Notifications">
-                <FaBell />
-                {unseenApprovedIds.length > 0 && <span className="badge">{unseenApprovedIds.length}</span>}
-              </button>
-
-              {showNotifDropdown && (
-                <div className="notif-dropdown">
-                  <div className="notif-header">Recent approvals</div>
-                  {registrations.filter(r => r.status === "Approved").length === 0 ? (
-                    <div className="notif-empty">No approvals yet</div>
-                  ) : (
-                    <ul className="notif-list">
-                      {registrations.filter(r => r.status === "Approved").map((r) => (
-                        <li key={r._id} onClick={() => navigate(`/student/registrations#${r._id}`)} className="notif-item">
-                          {r.eventId?.title || "Untitled event"}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* profile */}
-            <div className="profile-inline" onClick={toggleProfileMenu} ref={profileRef}>
-              <div className="avatar"><FaUserCircle /></div>
-            </div>
-
-            {showProfileMenu && (
-              <div className="profile-dropdown">
-                <p onClick={() => { setShowProfileMenu(false); navigate("/student/profile"); }}><FaUserCircle /> View Profile</p>
-                <p onClick={() => { setShowSettings(true); setShowProfileMenu(false); }}><FaCog /> Settings</p>
-                <p onClick={() => { setShowLogoutModal(true); }}><FaSignOutAlt /> Logout</p>
-              </div>
-            )}
-          </div>
-        </nav>
-
+      <div >
+        
         {/* Header */}
         <div className="registrations-header">
           <h2>My Event Registrations</h2>
@@ -458,20 +361,6 @@ const EventCard = ({ reg, colorClass }) => {
         </div>
       </div>
 
-      {/* settings modal */}
-      {showSettings && (
-        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
-          <div className="edit-profile-modal settings-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Settings</h3>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
-              <div><strong>Theme</strong><div style={{ fontSize: 13, color: "var(--muted)" }}>Toggle dark / light mode</div></div>
-              <button className="theme-toggle-btn" onClick={handleThemeToggle}>{darkMode ? <><FaSun /> Light</> : <><FaMoon /> Dark</>}</button>
-            </div>
-            <div className="modal-buttons"><button className="cancel-btn" onClick={() => setShowSettings(false)}>Close</button></div>
-          </div>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="modal-overlay" onClick={() => setDeleteModalOpen(false)}>
@@ -500,18 +389,9 @@ const EventCard = ({ reg, colorClass }) => {
           </div>
         </div>
       )}
-      {showLogoutModal && (
-        <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Are you sure you want to logout?</h3>
-            <div className="modal-buttons">
-              <button className="save-btn" onClick={() => { localStorage.removeItem("user"); navigate("/login"); }}>Yes</button>
-              <button className="cancel-btn" onClick={() => setShowLogoutModal(false)}>No</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      
+   
+    </StudentLayout>
   );
 };
 
